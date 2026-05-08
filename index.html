@@ -1,0 +1,77 @@
+<head>
+</head>
+<html>
+<body>
+<!-- Start of Talkdesk Code -->
+    <script>
+      var webchat;       
+((window, document, node, props, configs) => 
+	{         if (window.TalkdeskChatSDK) 
+		{           console.error("TalkdeskChatSDK already included");           
+			return;         }         
+	var divContainer = document.createElement("div"); 
+	divContainer.id = node;
+	document.body.appendChild(divContainer);
+	      
+	var src = 'https://talkdeskchatsdk.talkdeskapp.com/talkdeskchatsdk.js';         
+	var script = document.createElement("script");         
+	var firstScriptTag = document.getElementsByTagName("script")[0];         
+	script.type = "text/javascript";         
+	script.charset = "UTF-8";         
+	script.id = "tdwebchatscript";         
+	script.src = src;         
+	script.async = true;         
+	firstScriptTag.parentNode.insertBefore(script, firstScriptTag);         
+	script.onload = () => 
+	{           webchat = TalkdeskChatSDK(node, props);           
+			webchat.init(configs);           
+			/*            * Send custom data from your website to TalkDesk!            * If you would like to do it, you need to 				remove the following commented code and            * modify the webchat.setContextParam parameters to pass in the data 				you need.            */            /*
+	function setContext() {              
+	webchat.setContextParam({ "var1": "value1", "var2": "value2", "var3": 100 })            
+	}            // Send data when the chat conversation is initiated            
+	webchat.onConversationStart = function() {              setContext()            }            
+	// Send data when the chat widget is open            
+	webchat.onOpenWebchat = function() {              
+	setContext()            }*/        
+	 };       })
+	(         window,         document,         "tdWebchat",         
+	{ touchpointId: "1131e885298e4ad8b4a2d25fdf28a087", accountId: "", region: "td-us-1" },         
+	{ 
+	enableValidation: false, 
+	enableEmoji: true, 
+	enableUserInput: true, 
+	styles: {
+		chatTitle: "Agency Help Desk Chat",
+		chatThemeColor: "#1D607C", 
+		chatTitleIcon: "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015Nq00000MXBMb&oid=00DNq00000J8ZQf", 
+		chatTitleIconWidth: "32px",
+		chatTitleIconHeight: "32px",
+		chatSubtitle: "New York Life Agent Tech Support",
+		botIcon: "https://www.newyorklife.com/assets/icons/nyl-logo.svg", 
+		startChatButtonBorderColor: "#000000", 
+		startChatButtonBackgroundColor: "#1D607C", 
+		startChatButtonTextColor: "#FFFFFF", 
+		customButtonBackgroundColor: "#1D607C", 
+		customButtonColor: "#FFFFFF", 
+		botBackgroundColor: "#f2f4f5", 
+		customMessageBackgroundColor: "#f2f4f5", 
+		chatContainerWidth: "500px", 
+		chatContainerHeight: "600px", 
+		buttonBackgroundColor: "#1D607C", 
+		buttonTextColor: "#FFFFFF", 
+		buttonHoverBackgroundColor: "#000000", 
+		triggerButtonWidth: "250px",
+		triggerButtonHeight: "64px",
+		triggerButtonPositionBottom: '400px',
+		triggerButtonPositionRight: '80px', 
+		chatIcon: "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015Nq00000MpWpC&oid=00DNq00000J8ZQf"
+		}
+	}      
+	 );	
+	
+    </script>
+<!-- End of Talkdesk Code -->
+
+<a href="javascript:void(0);" onclick="webchat.selfHostedApp.open();">Click here to Chat</a>
+</body>
+</html>
