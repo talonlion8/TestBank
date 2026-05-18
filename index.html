@@ -2,6 +2,17 @@
 </head>
 <html>
 <body>
+<!-- The Trigger Button -->
+<button id="openBtn">Open Flyout</button>
+
+<!-- The Flyout Window (Modal) -->
+<div id="flyoutWindow" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h2>Flyout Window</h2>
+    <p>This is your content inside the flyout!</p>
+  </div>
+</div>
 <!-- Start of Talkdesk Code -->
     <script>
       var webchat;       
@@ -12,7 +23,7 @@
 	var divContainer = document.createElement("div"); 
 	divContainer.id = node;
 	document.body.appendChild(divContainer);
-	      
+
 	var src = 'https://talkdeskchatsdk.talkdeskapp.com/talkdeskchatsdk.js';         
 	var script = document.createElement("script");         
 	var firstScriptTag = document.getElementsByTagName("script")[0];         
@@ -42,12 +53,18 @@
 	enableUserInput: true, 
 	styles: {
 		chatTitle: "Agency Help Desk Chat",
-		chatThemeColor: "#1D607C", 
+		chatTitleColor: "#1D607C",
+		chatTitleTextColor: "#1D607C",
+		chatThemeColor: "transparent",
+		chatHoverThemeColor: "transparent", 
 		chatTitleIcon: "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015Nq00000MXBMb&oid=00DNq00000J8ZQf", 
+		chatMinimizeButtonColor: "000000",
+		chatCloseButonColor: "#DC143C",
 		chatTitleIconWidth: "32px",
 		chatTitleIconHeight: "32px",
+		chatSubtitleTextColor: "#1D607C",
 		chatSubtitle: "New York Life Agent Tech Support",
-		botIcon: "https://www.newyorklife.com/assets/icons/nyl-logo.svg", 
+		botIcon: "https://www.newyorklife.com/assets/icons/nyl-logo.svg",
 		startChatButtonBorderColor: "#000000", 
 		startChatButtonBackgroundColor: "#1D607C", 
 		startChatButtonTextColor: "#FFFFFF", 
@@ -56,14 +73,14 @@
 		botBackgroundColor: "#f2f4f5", 
 		customMessageBackgroundColor: "#f2f4f5", 
 		chatContainerWidth: "500px", 
-		chatContainerHeight: "600px", 
+		chatContainerHeight: "600px",
 		buttonBackgroundColor: "#1D607C", 
 		buttonTextColor: "#FFFFFF", 
 		buttonHoverBackgroundColor: "#000000", 
-		triggerButtonWidth: "100px",
-		triggerButtonHeight: "300px",
-		triggerButtonPositionBottom: '400px',
-		triggerButtonPositionRight: '80px', 
+		triggerButtonWidth: "Auto",
+		triggerButtonHeight: "100px",
+		triggerButtonPositionBottom: '50%',
+		triggerButtonPositionRight: 'fixed', 
 		chatIcon: "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015Nq00000NFiRh&oid=00DNq00000J8ZQf"
 		}
 	}      
