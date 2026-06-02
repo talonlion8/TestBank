@@ -19,6 +19,13 @@
 	notificationBar.style.left = 0;
 	notificationBar.style.right = 0;
 	notificationBar.style.color = 'yellow';
+	notificationBar.style.padding = '14px 18px';
+	notificationBar.style.setProperty('align-items', 'center');
+	notificationBar.style.setProperty('justify-content', 'center');
+	notificationBar.style.gap = '12px';	
+	notificationBar.style.setProperty('z-index', '9999');
+	notificationBar.style.setProperty('font-family', 'Arial', 'sans-serif');
+	notificationBar.style.setProperty('box-shadow', '0 -2px 8px rgba(0,0,0,.25));
 	document.body.appendChild(notificationBar);
 
 	enableNotifications = document.createElement("button");
@@ -32,16 +39,8 @@
   <button id="enableNotifications">Enable Notifications</button>
   <button id="dismissNotifications">Not now</button>
 </div>
-.notification-bar {
-  
-  padding: 14px 18px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  z-index: 9999;
-  font-family: Arial, sans-serif;
-  box-shadow: 0 -2px 8px rgba(0,0,0,.25);
+.notification-bar {  
+  display: none;    
 }
 
 .notification-bar button {
