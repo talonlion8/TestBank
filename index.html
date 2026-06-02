@@ -273,8 +273,7 @@ async function requestNotificationPermission() {
   if (!("Notification" in window)) return;
 
   if (Notification.permission === "default") {
-    await Notification.requestPermission();
-	document.GetElementById('notificationBar').style.display = 'block';
+    await Notification.requestPermission();	
   }
 }
 
@@ -303,6 +302,10 @@ if(button){
 if(button2){
   button2.addEventListener("click", requestNotificationPermission);
   document.GetElementById('notificationBar').style.display = 'none';
+  }
+
+if (Notification.permission === "default") {
+    document.GetElementById('notificationBar').style.display = 'block';
   }
   
   notifyNewChat("A new chat has arrived.");
