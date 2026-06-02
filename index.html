@@ -27,6 +27,7 @@
 	notificationBar.style.setProperty('z-index', '9999');
 	notificationBar.style.setProperty('font-family', 'Arial', 'sans-serif');
 	notificationBar.style.setProperty('box-shadow', '0 -2px 8px rgba(0,0,0,.25)');
+	notificationBar.style.display = 'none';
 	document.body.appendChild(notificationBar);
 
 	enableNotifications = document.createElement("button");
@@ -273,6 +274,7 @@ async function requestNotificationPermission() {
 
   if (Notification.permission === "default") {
     await Notification.requestPermission();
+	document.GetElementById('notificationBar').style.display = 'block';
   }
 }
 
@@ -291,9 +293,16 @@ function notifyNewChat(messageText) {
 }
 
 const button = document.querySelector("#enableNotifications");
+const button2 = document.querySelector("#disableNotifications");
 
 if(button){
   button.addEventListener("click", requestNotificationPermission);
+  document.GetElementById('notificationBar').style.display = 'none';
+  }
+
+if(button2){
+  button2.addEventListener("click", requestNotificationPermission);
+  document.GetElementById('notificationBar').style.display = 'none';
   }
   
   notifyNewChat("A new chat has arrived.");
