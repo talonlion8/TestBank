@@ -47,16 +47,7 @@
 	messagePrompt.textContent = "Enable notifications so you don’t miss incoming chats.";
 	notificationBar.appendChild(messagePrompt);
 	notificationBar.appendChild(enableNotifications);
-	notificationBar.appendChild(disableNotifications);
-		
-/*<button id="enableNotifications">Enable Notifications</button>
-  <button id="dismissNotifications">Not now</button>
-</div>
-.notification-bar {  
-  display: none;    
-}
- */
-    
+	notificationBar.appendChild(disableNotifications);    
 
 ((window, document, node, props, configs) => {         
     if (window.TalkdeskChatSDK) {           
@@ -291,21 +282,23 @@ function notifyNewChat(messageText) {
   }
 }
 
+const bar = document.getElementById("notificationBar");
 const button = document.querySelector("#enableNotifications");
 const button2 = document.querySelector("#disableNotifications");
 
 if(button){
-  button.addEventListener("click", requestNotificationPermission);
-  document.GetElementById('notificationBar').style.display = 'none';
+  button.addEventListener("click", async () => {
+    await requestNotificationPermission();
+    bar.style.display = "none";
+  });
   }
 
 if(button2){
-  button2.addEventListener("click", requestNotificationPermission);
-  document.GetElementById('notificationBar').style.display = 'none';
+  bar.style.display = 'none';
   }
 
 if (Notification.permission === "default") {
-    document.GetElementById('notificationBar').style.display = 'block';
+    bar.style.display = 'block';
   }
   
   notifyNewChat("A new chat has arrived.");
