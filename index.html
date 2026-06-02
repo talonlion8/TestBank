@@ -6,7 +6,48 @@
 <!-- Start of Talkdesk Code -->
     <script>
     var webchat;
-    const isMobile = window.innerWidth <= 768;	 
+    var notificationBar;
+	var enableNotifications;
+	var messagePrompt;
+    const isMobile = window.innerWidth <= 768;
+
+
+	notificationBar = document.createElement("div");
+	notificationBar.id = "notificationBar";
+	notificationBar.style.position= 'fixed';
+	notificationBar.style.bottom = 0;
+	notificationBar.style.left = 0;
+	notificationBar.style.right = 0;
+	notificationBar.style.color = 'yellow';
+
+	enableNotifications = document.createElement("button");
+	enableNotifications.id = "enableNotifications";
+
+    messagePrompt = document.createElement("span");
+    messagePrompt.id = "messagePrompt";
+		
+<!--<div id="notificationBar" class="notification-bar">
+  <span>Enable notifications so you don’t miss incoming chats.</span>
+  <button id="enableNotifications">Enable Notifications</button>
+  <button id="dismissNotifications">Not now</button>
+</div>
+.notification-bar {
+  
+  padding: 14px 18px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 9999;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 -2px 8px rgba(0,0,0,.25);
+}
+
+.notification-bar button {
+  padding: 8px 12px;
+  cursor: pointer;
+} --!>
+    
 
 ((window, document, node, props, configs) => {         
     if (window.TalkdeskChatSDK) {           
