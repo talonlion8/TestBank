@@ -8,6 +8,7 @@
     var webchat;
     var notificationBar;
 	var enableNotifications;
+	var dismissNotifications;
 	var messagePrompt;
     const isMobile = window.innerWidth <= 768;
 
@@ -30,25 +31,30 @@
 
 	enableNotifications = document.createElement("button");
 	enableNotifications.id = "enableNotifications";
+	enableNotifications.style.padding = '8px 12px';
+	enableNotifications.style.cursor = 'pointer';
+	enableNotifictions.textContent = 'Yes';
 
+	disableNotifications = document.createElement("button");
+	disableNotifications.id = "disableNotifications";
+    disableNotifications.style.padding = '8px 12px';
+	disableNotifications.style.cursor = 'pointer';
+	disableNotifictions.textContent = 'No';
+		
     messagePrompt = document.createElement("span");
     messagePrompt.id = "messagePrompt";
 	messagePrompt.textContent = "Enable notifications so you don’t miss incoming chats.";
 	notificationBar.appendChild(messagePrompt);
+	notificationBar.appendChild(enableNotifications);
+	notificationBar.appendChild(disableNotifications);
 		
-/*<div id="notificationBar" class="notification-bar">
-  <span>Enable notifications so you don’t miss incoming chats.</span>
-  <button id="enableNotifications">Enable Notifications</button>
+/*<button id="enableNotifications">Enable Notifications</button>
   <button id="dismissNotifications">Not now</button>
 </div>
 .notification-bar {  
   display: none;    
 }
-
-.notification-bar button {
-  padding: 8px 12px;
-  cursor: pointer;
-} */
+ */
     
 
 ((window, document, node, props, configs) => {         
