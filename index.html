@@ -18,7 +18,7 @@
 	notificationBar.style.top = 0;
 	notificationBar.style.left = 0;
 	notificationBar.style.right = 0;
-	notificationBar.style.backgroundColor = 'yellow';
+	notificationBar.style.backgroundColor = 'tan';
 	notificationBar.style.padding = '14px 18px';
 	notificationBar.style.setProperty('align-items', 'center');
 	notificationBar.style.setProperty('justify-content', 'center');
@@ -34,7 +34,7 @@
     messagePrompt = document.createElement("span");
     messagePrompt.id = "messagePrompt";
 	messagePrompt.style.textContent = "Enable notifications so you don’t miss incoming chats.";
-	document.notificationBar.appendChild(messagePrompt);
+	document.getElementByID('notificationBar').appendChild('messagePrompt');
 		
 /*<div id="notificationBar" class="notification-bar">
   <span>Enable notifications so you don’t miss incoming chats.</span>
