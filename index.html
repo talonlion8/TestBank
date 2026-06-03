@@ -82,6 +82,7 @@
     script.onload = () => {           
         webchat = TalkdeskChatSDK(node, props);           
         webchat.init(configs);           
+		setTimeout(watchTalkdeskMessages, 2000);
     };       
 
 })(         
@@ -306,8 +307,34 @@ if(button2){
   bar.style.display = 'none';
   });
   } 
-  notifyNewChat("A new chat has arrived.");
 
+  function watchTalkdeskMessages() {
+  const messageLists = findInShadowRoots('[data-qa="message-list"]');
+
+  messageLists.forEach((messageList) => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (!(node instanceof HTMLElement)) return;
+
+          const botMessage =
+            node.matches?.(".custom-bot[data-qa='textLink']")
+              ? node
+              : node.querySelector?.(".custom-bot[data-qa='textLink']");
+
+          if (botMessage && Notification.permission === "granted") {
+            notifyNewChat("A new chat response has arrived.");
+          }
+        });
+      });
+    });
+
+    observer.observe(messageList, {
+      childList: true,
+      subtree: true
+    });
+  });
+}
   </script>
 
 <a href="javascript:void(0);" onclick="webchat.selfHostedApp.open();">Click here to Chat</a>
