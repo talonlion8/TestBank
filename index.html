@@ -47,11 +47,7 @@
 	notificationBar.appendChild(messagePrompt);
 	notificationBar.appendChild(enableNotifications);
 	notificationBar.appendChild(disableNotifications); 
-
-	if (Notification.permission === "default") {
-    Bar.style.display = 'flex';
-    }
-
+	
 ((window, document, node, props, configs) => {         
     if (window.TalkdeskChatSDK) {           
         console.error("TalkdeskChatSDK already included");           
@@ -288,7 +284,11 @@ function notifyNewChat(messageText) {
 const bar = document.getElementById("notificationBar");
 const button = document.querySelector("#enableNotifications");
 const button2 = document.querySelector("#disableNotifications");
-
+		
+if (Notification.permission === "default") {
+    Bar.style.display = 'flex';
+    }
+		
 if(button){
   button.addEventListener("click", async () => {
     await requestNotificationPermission();
