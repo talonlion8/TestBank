@@ -277,7 +277,7 @@ async function requestNotificationPermission() {
 }
 
 function notifyNewChat(messageText) {
-  if (Notification.permission === "granted" && document.hidden) {
+  if (Notification.permission === "granted") { /*&& document.hidden*/
     const notification = new Notification("New Chat Message", {
       body: messageText,
       icon: "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015Nq00000MXBMb&oid=00DNq00000J8ZQf"
