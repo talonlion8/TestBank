@@ -12,6 +12,9 @@
 	var messagePrompt;
     const isMobile = window.innerWidth <= 768;
 
+    if (Notification.permission === "default") {
+    bar.style.display = 'block';
+    }
 
 	notificationBar = document.createElement("div");
 	notificationBar.id = "notificationBar";
