@@ -309,7 +309,7 @@ if(button2){
   } 
 
   function watchTalkdeskMessages() {
-  const messageLists = findInShadowRoots(.*);
+  const messageLists = findInShadowRoots('.*');
 
   messageLists.forEach((messageList) => {
     const observer = new MutationObserver((mutations) => {
