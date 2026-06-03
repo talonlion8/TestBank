@@ -309,18 +309,18 @@ if(button2){
   } 
 
   function watchTalkdeskMessages() {
-  const messageLists = findInShadowRoots('".custom-bot[data-qa='*']"');
+  const messageLists = findInShadowRoots('".custom-bot[data-qa='MessageContainer']"');
 
-  messageLists.forEach((messageList) => {
+  messageLists.forEach((MessageContainer => {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
           if (!(node instanceof HTMLElement)) return;
 
           const botMessage =
-            node.matches?.(".custom-bot[data-qa='textLink']")
+            node.matches?.(".custom-bot[data-qa='MessageContainer']")
               ? node
-              : node.querySelector?.(".custom-bot[data-qa='textLink']");
+              : node.querySelector?.(".custom-bot[data-qa='MessageContainer']");
 
           if (botMessage && Notification.permission === "granted") {
             notifyNewChat("A new chat response has arrived.");
@@ -329,7 +329,7 @@ if(button2){
       });
     });
 
-    observer.observe(messageList, {
+    observer.observe(MessageContainer, {
       childList: true,
       subtree: true
     });
