@@ -12,11 +12,7 @@
 	var messagePrompt;
     const isMobile = window.innerWidth <= 768;
 
-    if (Notification.permission === "default") {
-    bar.style.display = 'block';
-    }
-
-	notificationBar = document.createElement("div");
+    notificationBar = document.createElement("div");
 	notificationBar.id = "notificationBar";
 	notificationBar.style.position= 'fixed';
 	notificationBar.style.top = 0;
@@ -50,7 +46,11 @@
 	messagePrompt.textContent = "Enable notifications so you don’t miss incoming chats.";
 	notificationBar.appendChild(messagePrompt);
 	notificationBar.appendChild(enableNotifications);
-	notificationBar.appendChild(disableNotifications);    
+	notificationBar.appendChild(disableNotifications); 
+
+	if (Notification.permission === "default") {
+    bar.style.display = 'flex';
+    }
 
 ((window, document, node, props, configs) => {         
     if (window.TalkdeskChatSDK) {           
@@ -298,12 +298,7 @@ if(button){
 
 if(button2){
   bar.style.display = 'none';
-  }
-
-if (Notification.permission === "default") {
-    bar.style.display = 'block';
-  }
-  
+  } 
   notifyNewChat("A new chat has arrived.");
 
   </script>
