@@ -297,6 +297,14 @@ function fixEndChatButton() {
     transform: none !important;
   `;
 
+if (!btn.dataset.closeHandlerAdded) {
+    btn.addEventListener("click", () => {
+      webchat.selfHostedApp.webchatRef.current.closeWebchat();
+      
+    });
+
+    btn.dataset.closeHandlerAdded = "true";
+  }
 
   inner.innerHTML = "×";
 
