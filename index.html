@@ -1,309 +1,52 @@
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<html>
-<body style="background-image: url('InfoCentral.png'); background-size: cover;">
-<!-- Start of Talkdesk Code -->
-    <script>
-    var webchat;
-    const isMobile = window.innerWidth <= 768;	 
-
-((window, document, node, props, configs) => {         
-    if (window.TalkdeskChatSDK) {           
-        console.error("TalkdeskChatSDK already included");           
-        return;         
-    }         
-
-    var divContainer = document.createElement("div"); 
-    divContainer.id = node;
-    document.body.appendChild(divContainer);
-
-    var src = 'https://talkdeskchatsdk.talkdeskapp.com/talkdeskchatsdk.js';         
-    var script = document.createElement("script");         
-    var firstScriptTag = document.getElementsByTagName("script")[0];         
-
-    script.type = "text/javascript";         
-    script.charset = "UTF-8";         
-    script.id = "tdwebchatscript";         
-    script.src = src;         
-    script.async = true;         
-
-    firstScriptTag.parentNode.insertBefore(script, firstScriptTag);         
-
-    script.onload = () => {           
-        webchat = TalkdeskChatSDK(node, props);           
-        webchat.init(configs);      	
-    };       
-
-})(         
-    window,         
-    document,         
-    "tdWebchat",         
-
-    { 
-        touchpointId: "1131e885298e4ad8b4a2d25fdf28a087", 
-        accountId: "", 
-        region: "td-us-1" 
-    },         
-
-    { 
-        enableValidation: false, 
-        enableEmoji: true, 
-        enableUserInput: true, 
-	    enableResponsiveLayout: false, 
-     
-
-        styles: {
-            chatTitle: "Agent Help Desk Support",
-            chatTitleColor: "#1D607C",
-            chatTitleTextColor: "#FFFFFF",
-            chatThemeColor: "transparent",
-            chatHoverThemeColor: "transparent",
-
-            chatTitleIcon: "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.FileDownload?file=015Nq00000NloQl%22",
-			
-
-            chatMinimizeButtonColor: "#000000",
-            chatCloseButonColor: "#DC143C",
-
-            chatTitleIconWidth: "32px",
-            chatTitleIconHeight: "32px",
-
-            chatSubtitleTextColor: "#FFFFFF",
-            chatSubtitle: "New York Life Agent Tech Support",
-
-            //botIcon: "https://www.newyorklife.com/assets/icons/nyl-logo.svg",
-
-            startChatButtonBorderColor: "#000000",
-            startChatButtonBackgroundColor: "#1D607C",
-            startChatButtonTextColor: "#FFFFFF",
-
-            customButtonBackgroundColor: "#1D607C",
-            customButtonColor: "#FFFFFF",
-
-            botBackgroundColor: "#f2f4f5",
-            customMessageBackgroundColor: "#f2f4f5",
-
-            chatContainerWidth: isMobile ? "60%" : "500px",
-            chatContainerHeight: isMobile ? "85%" : "600px",
-
-            buttonBackgroundColor: "#1D607C",
-            buttonTextColor: "#FFFFFF",
-            buttonHoverBackgroundColor: "#000000",
-
-            triggerButtonWidth: "auto",
-            triggerButtonHeight: isMobile ? "50px" : "170px",
-            triggerButtonPositionBottom: isMobile ? "0px" : "50%",
-            triggerButtonPositionRight: isMobile ? "0px" : "-18px",
-
-            chatIcon: isMobile ? "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015Nq00000MXBMb&oid=00DNq00000J8ZQf" : "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015Nq00000Nlq2j&oid=00DNq00000J8ZQf"
-        }
-    }      
-);
-
-
-function findInShadowRoots(selector, root = document) {
-
-    const results = [];
-
-    const elements = root.querySelectorAll('*');	
-
-    elements.forEach(el => {
-
-        if (el.shadowRoot) {
-
-            const found = el.shadowRoot.querySelectorAll(selector);
-
-            if (found.length) {
-                results.push(...found);
-            }
-
-            results.push(...findInShadowRoots(selector, el.shadowRoot));
-        }
-    });
-
-    return results;
-}
-
-function setTalkdeskHeaderColor(color) {
-    const minimizeButtons = findInShadowRoots('[data-qa="minimize-button"]');
-	var radius = isMobile ? '25px 25px 0 0 ' : '50px 50px 0 0';
-
-    minimizeButtons.forEach(button => {
-        const headerDiv = button.parentElement;
-
-        if (headerDiv) {
-            headerDiv.style.setProperty(
-                'background-color',
-                color,
-                'important'
-            );
-        }
-		
-		if (headerDiv) {		    
-            headerDiv.style.setProperty(
-                'border-radius',
-                 radius,
-                'important'
-            );			
-        }
-    });
-
-    return minimizeButtons.length > 0;
-}
-
-function setStyledWebchatAndBodyRoundEdges(radius) {
-    const webchats = findInShadowRoots('[data-qa="StyledWebchat"]');
-
-    webchats.forEach(webchat => {
-        webchat.style.setProperty('border-radius', radius, 'important');
-
-        const initialScreen = webchat.querySelector('[class*="initialScreen"]');
-        const messageList = webchat.querySelector('[data-qa="message-list"]');
-
-        if (initialScreen) {
-            initialScreen.style.setProperty('border-radius', radius, 'important');
-        }
-
-        if (messageList) {
-            messageList.style.setProperty('border-radius', radius, 'important');
-        }
-    });
-}
-function applyTalkdeskStyles() {
-
-    const elements = findInShadowRoots(
-        '[class*="headerTitle"], [class*="label"]'
-    );
-    var radius = isMobile ? "30px 30px 25px 25px" :	"50px 50px 25px 25px";
-
-    elements.forEach(el => {
-
-        // Skip required asterisk spans
-        if (
-            typeof el.className === 'string' &&
-            el.className.includes('isRequired')
-        ) {
-            return;
-        }
-
-        // Force bold
-        el.style.setProperty('font-weight', '700', 'important');
-
-       
-    });
-
-    const allDivs = findInShadowRoots('div');
-
-    allDivs.forEach(div => {
-
-        const style = div.getAttribute('style') || '';
-
-        // Detect the circular SVG avatar div
-        if (
-            style.includes('border-radius: 50%') &&
-            style.includes('32px') &&
-            style.includes('data:image/svg+xml')
-        ) {
-
-            div.style.setProperty('display', 'none', 'important');
-        }
-    });
-
-
-    setTalkdeskHeaderColor('#1D607C');
-	
-    setStyledWebchatAndBodyRoundEdges(radius);
- 
-    requestAnimationFrame(applyTalkdeskStyles);
-    fixEndChatButton();
-}
-
-applyTalkdeskStyles();
-
-document.addEventListener('click', function (event) {
-    const webchatContainer = findInShadowRoots('[data-qa="StyledWebchat"]');
-    const openButton = findInShadowRoots('.triggerButtonContainer_Y6_HL');
-
-    if (!webchatContainer) return;
-
-    const path = event.composedPath();
-
-    // Ignore clicks originating inside any shadow DOM
-    const isInsideShadowDOM = path.some(node => node instanceof ShadowRoot);
-
-    if (isInsideShadowDOM) {
-        return;
-    }
-
-    const clickedInsideWebchat = path.includes(webchatContainer);
-    const clickedOpenButton = openButton && path.includes(openButton);
-
-    if (!clickedInsideWebchat && !clickedOpenButton) {
-        webchat.selfHostedApp.close();
-    }
-}, true);
-
-function deepQuerySelector(selector, root = document) {
-  const found = root.querySelector(selector);
-  if (found) return found;
-
-  for (const el of root.querySelectorAll("*")) {
-    if (el.shadowRoot) {
-      const result = deepQuerySelector(selector, el.shadowRoot);
-      if (result) return result;
-    }
-  }
-
-  return null;
+function customCloseHandler() {
+  webchat.selfHostedApp.webchatRef.current.closeWebchat();
 }
 
 function fixEndChatButton() {
   const btn = deepQuerySelector('[data-qa="end-chat-conversation-button"]');
-  if (!btn) return;  
+  if (!btn) return;
 
+  const talkdeskHasEnabledIt = !btn.disabled && !btn.hasAttribute("disabled");
+
+  // If Talkdesk native is active, remove our fallback
+  if (talkdeskHasEnabledIt && btn.dataset.closeHandlerAdded) {
+    btn.removeEventListener("click", customCloseHandler);
+    delete btn.dataset.closeHandlerAdded;
+    return;
+  }
+
+  // Fallback while Talkdesk has it disabled
   btn.disabled = false;
-  btn.removeAttribute("disabled");  
-
-  btn.style.setProperty("width", "24px", "important");
-  btn.style.setProperty("height", "24px", "important");
+  btn.removeAttribute("disabled");
   btn.style.setProperty("pointer-events", "auto", "important");
   btn.style.setProperty("cursor", "pointer", "important");
 
   const inner = btn.querySelector("div");
-  if (!inner) return;
-
- inner.style.cssText = `
-    width: 24px !important;
-    height: 24px !important;
-    color: red !important;
-    cursor: pointer !important;
-    filter: none !important;
-    opacity: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 22px !important;
-    font-weight: 600 !important;
-    line-height: 24px !important;
-    font-family: Arial, sans-serif !important;
-    transform: none !important;
-  `;
-
-if (!btn.dataset.closeHandlerAdded) {
-    btn.addEventListener("click", () => {
-      webchat.selfHostedApp.webchatRef.current.closeWebchat();
-      
-    });
-
-    btn.dataset.closeHandlerAdded = "true";
+  if (inner) {
+    inner.innerHTML = "×";
+    inner.style.cssText = `
+      width: 24px !important;
+      height: 24px !important;
+      color: red !important;
+      cursor: pointer !important;
+      filter: none !important;
+      opacity: 1 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 22px !important;
+      font-weight: 600 !important;
+      line-height: 24px !important;
+      font-family: Arial, sans-serif !important;
+      transform: none !important;
+    `;
   }
 
-  inner.innerHTML = "×";
-
+  if (!btn.dataset.closeHandlerAdded) {
+    btn.addEventListener("click", customCloseHandler);
+    btn.dataset.closeHandlerAdded = "true";
+  }
 }
-
-fixEndChatButton();
 
 const observer = new MutationObserver(fixEndChatButton);
 
@@ -314,8 +57,4 @@ observer.observe(document.body, {
   attributeFilter: ["disabled", "style", "class"]
 });
 
-  </script>
-<!-- End of Talkdesk Code -->
-
-</body>
-</html>
+fixEndChatButton();
