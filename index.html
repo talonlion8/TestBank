@@ -6,57 +6,8 @@
 <!-- Start of Talkdesk Code -->
     <script>
     var webchat;
-    var notificationBar;
-	var enableNotifications;
-	var dismissNotifications;
-	var messagePrompt;
-    const isMobile = window.innerWidth <= 768;
+    const isMobile = window.innerWidth <= 768;	 
 
-    notificationBar = document.createElement("div");
-	notificationBar.id = "notificationBar";
-	notificationBar.style.position= 'fixed';
-	notificationBar.style.top = 0;
-	notificationBar.style.left = 0;
-	notificationBar.style.right = 0;
-	notificationBar.style.backgroundColor = 'tan';
-	notificationBar.style.padding = '14px 18px';
-	notificationBar.style.setProperty('align-items', 'center');
-	notificationBar.style.setProperty('justify-content', 'center');
-	notificationBar.style.gap = '12px';	
-	notificationBar.style.setProperty('z-index', '9999');
-	notificationBar.style.setProperty('font-family', 'Arial', 'sans-serif');
-	notificationBar.style.setProperty('box-shadow', '0 -2px 8px rgba(0,0,0,.25)');
-	notificationBar.style.display = 'none';
-	document.body.appendChild(notificationBar);
-
-	enableNotifications = document.createElement("button");
-	enableNotifications.id = "enableNotifications";
-	enableNotifications.style.padding = '8px 12px';
-	enableNotifications.style.cursor = 'pointer';
-	enableNotifications.textContent = 'Yes';
-
-	disableNotifications = document.createElement("button");
-	disableNotifications.id = "disableNotifications";
-    disableNotifications.style.padding = '8px 12px';
-	disableNotifications.style.cursor = 'pointer';
-	disableNotifications.textContent = 'No';
-		
-    messagePrompt = document.createElement("span");
-    messagePrompt.id = "messagePrompt";
-	messagePrompt.textContent = "Enable notifications so you don’t miss incoming chats.";
-	notificationBar.appendChild(messagePrompt);
-	notificationBar.appendChild(enableNotifications);
-	notificationBar.appendChild(disableNotifications); 
-
-	const bar = document.getElementById("notificationBar");
-
-	
-	if (Notification.permission === "default") {
-   		 bar.style.display = 'flex';
-		
-    }
-	
-	
 ((window, document, node, props, configs) => {         
     if (window.TalkdeskChatSDK) {           
         console.error("TalkdeskChatSDK already included");           
@@ -81,8 +32,7 @@
 
     script.onload = () => {           
         webchat = TalkdeskChatSDK(node, props);           
-        webchat.init(configs);           
-		setTimeout(watchTalkdeskMessages, 2000);
+        webchat.init(configs);      	
     };       
 
 })(         
@@ -100,7 +50,14 @@
         enableValidation: false, 
         enableEmoji: true, 
         enableUserInput: true, 
-	    enableResponsiveLayout: false,
+	    enableResponsiveLayout: false, 
+
+        chat: {
+          endChatButton: {
+          active: true,
+          text: ""
+                }
+              },		
 
         styles: {
             chatTitle: "Agent Help Desk Support",
@@ -265,78 +222,99 @@ function applyTalkdeskStyles() {
     setStyledWebchatAndBodyRoundEdges(radius);
  
     requestAnimationFrame(applyTalkdeskStyles);
+    fixEndChatButton();
 }
 
 applyTalkdeskStyles();
 
-async function requestNotificationPermission() {
-  if (!("Notification" in window)) return;
+document.addEventListener('click', function (event) {
+    const webchatContainer = findInShadowRoots('[data-qa="StyledWebchat"]');
+    const openButton = findInShadowRoots('.triggerButtonContainer_Y6_HL');
 
-  if (Notification.permission === "default") {
-    await Notification.requestPermission();	
+    if (!webchatContainer) return;
+
+    const path = event.composedPath();
+
+    // Ignore clicks originating inside any shadow DOM
+    const isInsideShadowDOM = path.some(node => node instanceof ShadowRoot);
+
+    if (isInsideShadowDOM) {
+        return;
+    }
+
+    const clickedInsideWebchat = path.includes(webchatContainer);
+    const clickedOpenButton = openButton && path.includes(openButton);
+
+    if (!clickedInsideWebchat && !clickedOpenButton) {
+        webchat.selfHostedApp.close();
+    }
+}, true);
+
+function deepQuerySelector(selector, root = document) {
+  const found = root.querySelector(selector);
+  if (found) return found;
+
+  for (const el of root.querySelectorAll("*")) {
+    if (el.shadowRoot) {
+      const result = deepQuerySelector(selector, el.shadowRoot);
+      if (result) return result;
+    }
   }
+
+  return null;
 }
 
-function notifyNewChat(messageText) {
-  if (Notification.permission === "granted") { /*&& document.hidden*/
-    const notification = new Notification("New Chat Message", {
-      body: messageText,
-      icon: "https://nylic--devrelease.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015Nq00000MXBMb&oid=00DNq00000J8ZQf"
-    });
+function fixEndChatButton() {
+  const btn = deepQuerySelector('[data-qa="end-chat-conversation-button"]');
+  if (!btn) return;  
 
-    notification.onclick = () => {
-      window.focus();
-      notification.close();
-    };
-  }
- console.log("Notification object:", notification);
+  btn.disabled = false;
+  btn.removeAttribute("disabled");
+  btn.click = null;
+
+  btn.style.setProperty("width", "24px", "important");
+  btn.style.setProperty("height", "24px", "important");
+  btn.style.setProperty("pointer-events", "auto", "important");
+  btn.style.setProperty("cursor", "pointer", "important");
+
+  const inner = btn.querySelector("div");
+  if (!inner) return;
+
+ inner.style.cssText = `
+    width: 24px !important;
+    height: 24px !important;
+    color: red !important;
+    cursor: pointer !important;
+    filter: none !important;
+    opacity: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    line-height: 24px !important;
+    font-family: Arial, sans-serif !important;
+    transform: none !important;
+  `;
+
+
+  inner.innerHTML = "×";
+
 }
 
-const button = document.querySelector("#enableNotifications");
-const button2 = document.querySelector("#disableNotifications");
-		
-if(button){
-  button.addEventListener("click", async () => {
-    await requestNotificationPermission();
-    bar.style.display = "none";
-  });
-  }
+fixEndChatButton();
 
-if(button2){
-  button2.addEventListener("click", async () => {
-  bar.style.display = 'none';
-  });
-  } 
+const observer = new MutationObserver(fixEndChatButton);
 
-  function watchTalkdeskMessages() {
-  const messageLists = findInShadowRoots('".custom-bot[data-qa='MessageContainer']"');
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+  attributeFilter: ["disabled", "style", "class"]
+});
 
-  messageLists.forEach((MessageContainer => {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (!(node instanceof HTMLElement)) return;
-
-          const botMessage =
-            node.matches?.(".custom-bot[data-qa='MessageContainer']")
-              ? node
-              : node.querySelector?.(".custom-bot[data-qa='MessageContainer']");
-
-          if (botMessage && Notification.permission === "granted") {
-            notifyNewChat("A new chat response has arrived.");
-          }
-        });
-      });
-    });
-
-    observer.observe(MessageContainer, {
-      childList: true,
-      subtree: true
-    });
-  });
-}
   </script>
+<!-- End of Talkdesk Code -->
 
-<a href="javascript:void(0);" onclick="webchat.selfHostedApp.open();">Click here to Chat</a>
 </body>
 </html>
