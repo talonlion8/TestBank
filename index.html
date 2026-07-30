@@ -215,8 +215,11 @@ function applyTalkdeskStyles() {
 	
     setStyledWebchatAndBodyRoundEdges(radius);
  
-    requestAnimationFrame(applyTalkdeskStyles);
     fixEndChatButton();
+	
+	installConfirmationBridgeOnShadowRoots(document);
+	
+	requestAnimationFrame(applyTalkdeskStyles);
 }
 
 applyTalkdeskStyles();
@@ -262,53 +265,601 @@ function customCloseHandler() {
   webchat.selfHostedApp.webchatRef.current.closeWebchat();
 }
 
+function getReactProps(element) {
+  if (!element) return null;
+
+  const key = Object.keys(element).find(
+    (name) =>
+      name.startsWith("__reactProps$") ||
+      name.startsWith("__reactEventHandlers$")
+  );
+
+  return key ? element[key] : null;
+}
+
+function findTalkdeskHandler(startElement) {
+  let element = startElement;
+
+  while (element) {
+    const props = getReactProps(element);
+
+    if (props) {
+      const handler =
+        props.onClick ||
+        props.onPointerDown ||
+        props.onMouseDown;
+
+      if (typeof handler === "function") {
+        return {
+          element,
+          handler,
+          props
+        };
+      }
+    }
+
+    element = element.parentElement;
+  }
+
+  return null;
+}
+
+function findTalkdeskHandler(startElement) {
+  let element = startElement;
+
+  while (element) {
+    const props = getReactProps(element);
+
+    if (props) {
+      const handler =
+        props.onClick ||
+        props.onPointerDown ||
+        props.onMouseDown;
+
+      if (typeof handler === "function") {
+        return {
+          element,
+          handler,
+          props
+        };
+      }
+    }
+
+    element = element.parentElement;
+  }
+
+  return null;
+}
+
 function fixEndChatButton() {
-  const btn = deepQuerySelector('[data-qa="end-chat-conversation-button"]');
+  installEndChatStyles();
+
+  const btn = deepQuerySelector(
+    '[data-qa="end-chat-conversation-button"]'
+  );
+
   if (!btn) return;
 
-  const talkdeskHasEnabledIt = !btn.disabled && !btn.hasAttribute("disabled");
+  styleNativeCloseIcon(btn);
+  forceEndChatPointer(btn);
 
-  // If Talkdesk native is active, remove our fallback
-  if (talkdeskHasEnabledIt && btn.dataset.closeHandlerAdded) {
-    btn.removeEventListener("click", customCloseHandler);
-	console.log('native Active');
-    delete btn.dataset.closeHandlerAdded;
+  /*
+   * Re-enable the real Talkdesk button, but allow its native
+   * React event system to process the click.
+   */
+  if (btn.disabled) {
+    btn.disabled = false;
+  }
+
+  btn.removeAttribute("disabled");
+  btn.removeAttribute("aria-disabled");
+
+  btn.style.setProperty(
+    "pointer-events",
+    "auto",
+    "important"
+  );
+
+  btn.style.setProperty(
+    "cursor",
+    "pointer",
+    "important"
+  );
+
+  btn.style.setProperty(
+    "opacity",
+    "1",
+    "important"
+  );
+  if (btn.dataset.customEndHandlerAdded === "true") return;
+
+btn.dataset.customEndHandlerAdded = "true";
+
+btn.addEventListener(
+  "click",
+  function customEndChatClick(event) {
+  
+     const reactHandler = findTalkdeskHandler(btn);
+
+    if (!reactHandler?.handler) {
+      console.error(
+        "Talkdesk React end-chat handler was not found."
+      );
+      return;
+    }
+	
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    event.stopPropagation();   
+
+    let syntheticDefaultPrevented = false;
+    let syntheticPropagationStopped = false;
+
+    const reactLikeEvent = {
+      nativeEvent: event,
+      currentTarget: btn,
+      target: btn,
+      type: "click",
+
+      bubbles: true,
+      cancelable: true,
+      defaultPrevented: false,
+
+      button: event.button ?? 0,
+      buttons: event.buttons ?? 0,
+      detail: event.detail ?? 1,
+
+      clientX: event.clientX ?? 0,
+      clientY: event.clientY ?? 0,
+      screenX: event.screenX ?? 0,
+      screenY: event.screenY ?? 0,
+
+      altKey: event.altKey ?? false,
+      ctrlKey: event.ctrlKey ?? false,
+      metaKey: event.metaKey ?? false,
+      shiftKey: event.shiftKey ?? false,
+
+      timeStamp: event.timeStamp,
+      view: event.view || window,
+
+      preventDefault() {
+        syntheticDefaultPrevented = true;
+        this.defaultPrevented = true;
+      },
+
+      stopPropagation() {
+        syntheticPropagationStopped = true;
+      },
+
+      isDefaultPrevented() {
+        return syntheticDefaultPrevented;
+      },
+
+      isPropagationStopped() {
+        return syntheticPropagationStopped;
+      },
+
+      persist() {}
+    };
+
+    try {
+      reactHandler.handler(reactLikeEvent);
+    } catch (error) {
+      console.error(
+        "Talkdesk end-chat handler failed:",
+        error
+      );
+    }
+  },
+  true
+);
+}
+
+function forceEndChatPointer(btn) {
+  if (!btn) return;
+
+  btn.style.setProperty("cursor", "pointer", "important");
+
+  btn.querySelectorAll("*").forEach((el) => {
+    el.style.setProperty("cursor", "pointer", "important");
+  });
+}
+
+function styleNativeCloseIcon(btn) {
+  if (!btn) return;
+
+  /*
+   * Talkdesk creates a new button after minimize/reopen, so each
+   * new button is styled once. Existing buttons are left untouched.
+   */
+  if (btn.dataset.customIconStyled === "true") {
     return;
   }
 
-  // Fallback while Talkdesk has it disabled
-  btn.disabled = false;
-  btn.removeAttribute("disabled");
-  btn.style.setProperty("pointer-events", "auto", "important");
-  btn.style.setProperty("cursor", "pointer", "important");
+  const svg = btn.querySelector("svg");
+  const path = svg?.querySelector("path");
+  const wrapper = svg?.parentElement;
 
-  const inner = btn.querySelector("div");
-  if (inner) {
-    inner.innerHTML = "×";
-    inner.style.cssText = `
-      width: 24px !important;
-      height: 24px !important;
-      color: red !important;
-      cursor: pointer !important;
-      filter: none !important;
-      opacity: 1 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      font-size: 22px !important;
-      font-weight: 600 !important;
-      line-height: 24px !important;
-      font-family: Arial, sans-serif !important;
-      transform: none !important;
-    `;
+  if (!svg || !path || !wrapper) return;
+
+  btn.dataset.customIconStyled = "true";
+
+  const red = "#ff0000";
+
+  /*
+   * This wrapper filter was the cause of the gray color.
+   */
+  wrapper.style.setProperty(
+    "filter",
+    "none",
+    "important"
+  );
+
+  wrapper.style.setProperty(
+    "color",
+    red,
+    "important"
+  );
+
+  wrapper.style.setProperty(
+    "opacity",
+    "1",
+    "important"
+  );
+
+  btn.style.setProperty(
+    "color",
+    red,
+    "important"
+  );
+
+  /*
+   * Preserve Talkdesk's original 24×24 SVG structure.
+   */
+  svg.setAttribute("height", "100%");
+  svg.setAttribute("width", "100%");
+  svg.setAttribute("fill", "currentColor");
+
+  svg.style.setProperty(
+    "color",
+    red,
+    "important"
+  );
+
+  svg.style.setProperty(
+    "fill",
+    "currentColor",
+    "important"
+  );
+
+  svg.style.setProperty(
+    "filter",
+    "none",
+    "important"
+  );
+
+  path.removeAttribute("stroke");
+  path.setAttribute("fill", "currentColor");
+
+  path.style.setProperty(
+    "fill",
+    "currentColor",
+    "important"
+  );
+}
+
+function installEndChatStyles() {
+  if (
+    document.getElementById(
+      "custom-end-chat-styles"
+    )
+  ) {
+    return;
   }
 
-  if (!btn.dataset.closeHandlerAdded) {
-    btn.addEventListener("click", customCloseHandler);
-    btn.dataset.closeHandlerAdded = "true";
+  const style = document.createElement("style");
+  style.id = "custom-end-chat-styles";
+
+  style.textContent = `
+    [data-qa="end-chat-conversation-button"] {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      opacity: 1 !important;
+      color: #ff0000 !important;
+    }
+
+    [data-qa="end-chat-conversation-button"] > div {
+      color: #ff0000 !important;
+      filter: none !important;
+      opacity: 1 !important;
+    }
+
+    [data-qa="end-chat-conversation-button"] svg {
+      color: #ff0000 !important;
+      fill: currentColor !important;
+      filter: none !important;
+    }
+
+    [data-qa="end-chat-conversation-button"] svg path {
+      fill: currentColor !important;
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+function installEndChatConfirmationBridge() {
+  if (window.__endChatConfirmationBridgeInstalled) return;
+
+  window.__endChatConfirmationBridgeInstalled = true;
+
+  /*
+   * Talkdesk can recreate its shadow roots after minimize/reopen,
+   * so scan repeatedly from the existing styling loop.
+   */
+  installConfirmationBridgeOnShadowRoots(document);
+}
+
+function installConfirmationBridgeOnShadowRoots(root) {
+  /*
+   * If this root is a shadow root, install one delegated listener.
+   */
+  if (
+    root instanceof ShadowRoot &&
+    !root.__customEndChatBridgeInstalled
+  ) {
+    root.__customEndChatBridgeInstalled = true;
+
+    root.addEventListener(
+      "click",
+      handleTalkdeskConfirmationClick,
+      true
+    );
+
+    console.log(
+      "Installed confirmation bridge on Talkdesk shadow root:",
+      root
+    );
+  }
+
+  root.querySelectorAll("*").forEach((element) => {
+    if (!element.shadowRoot) return;
+
+    installConfirmationBridgeOnShadowRoots(
+      element.shadowRoot
+    );
+  });
+}
+
+function getReactClickHandler(element) {
+  if (!element) return null;
+
+  const reactKey = Object.keys(element).find(
+    (key) =>
+      key.startsWith("__reactProps$") ||
+      key.startsWith("__reactEventHandlers$")
+  );
+
+  if (!reactKey) {
+    console.error(
+      "No React props key found on:",
+      element
+    );
+
+    return null;
+  }
+
+  const props = element[reactKey];
+
+  console.log(
+    "Talkdesk confirmation React props:",
+    props
+  );
+
+  return typeof props?.onClick === "function"
+    ? props.onClick
+    : null;
+}
+
+function invokeTalkdeskConfirm(button) {
+  const handler = getReactClickHandler(button);
+
+  if (!handler) {
+    console.error(
+      "Talkdesk confirmation onClick was not found."
+    );
+
+    return false;
+  }
+
+  console.log("Confirmation handler:", {
+    name: handler.name,
+    source: handler.toString()
+  });
+
+  try {
+    /*
+     * Production showed that confirm() accepts no event.
+     */
+    const result = handler.call(undefined);
+
+    console.log(
+      "Talkdesk confirm routine invoked.",
+      result
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Talkdesk confirm routine threw an error:",
+      error
+    );
+
+    return false;
   }
 }
 
+function handleTalkdeskConfirmationClick(event) {
+  const path = event.composedPath();
+
+  const confirmButton = path.find((element) => {
+    return (
+      element instanceof HTMLButtonElement &&
+      element.getAttribute("aria-label") ===
+        "confirm-action"
+    );
+  });
+
+  if (!confirmButton) return;
+
+  const confirmContainer = path.find((element) => {
+    return (
+      element instanceof HTMLElement &&
+      typeof element.className === "string" &&
+      element.className.includes(
+        "confirmEndChatContainer"
+      )
+    );
+  });
+
+  if (!confirmContainer) return;
+
+  /*
+   * Prevent the same Talkdesk confirm routine from being
+   * called once by us and once by React.
+   */
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+
+  if (
+    confirmButton.dataset.customConfirmInvoked === "true"
+  ) {
+    return;
+  }
+
+  confirmButton.dataset.customConfirmInvoked = "true";
+
+  console.log(
+    "Invoking Talkdesk's real confirm routine:",
+    confirmButton
+  );
+
+  const invoked =
+    invokeTalkdeskConfirm(confirmButton);
+
+  if (!invoked) {
+    confirmButton.dataset.customConfirmInvoked = "false";
+
+    console.error(
+      "Talkdesk confirm routine could not be invoked."
+    );
+  }
+}
+
+function waitForTalkdeskConfirmationToFinish(confirmContainer) {
+  const startedAt = Date.now();
+  const timeoutMs = 15000;
+
+  function check() {
+    const stillOpen =
+      confirmContainer.isConnected &&
+      isElementVisible(confirmContainer);
+
+    if (!stillOpen) {
+      console.log(
+        "Talkdesk end-chat routine completed."
+      );
+
+      closeTalkdeskWebChat();
+      return;
+    }
+
+    if (Date.now() - startedAt >= timeoutMs) {
+      console.error(
+        "Talkdesk end-chat confirmation timed out."
+      );
+      return;
+    }
+
+    requestAnimationFrame(check);
+  }
+
+  requestAnimationFrame(check);
+}
+
+function closeTalkdeskWebChat() {
+  try {
+    const closeWebchat =
+      webchat?.selfHostedApp?.webchatRef?.current
+        ?.closeWebchat;
+
+    if (typeof closeWebchat !== "function") {
+      console.error(
+        "Talkdesk closeWebchat method is unavailable.",
+        {
+          webchat,
+          selfHostedApp: webchat?.selfHostedApp,
+          webchatRef:
+            webchat?.selfHostedApp?.webchatRef,
+          current:
+            webchat?.selfHostedApp?.webchatRef?.current
+        }
+      );
+
+      return false;
+    }
+
+    closeWebchat.call(
+      webchat.selfHostedApp.webchatRef.current
+    );
+
+    console.log(
+      "Talkdesk closeWebchat method called successfully."
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Talkdesk closeWebchat failed:",
+      error
+    );
+
+    return false;
+  }
+}
+
+function isElementVisible(element) {
+  if (!element?.isConnected) return false;
+
+  const rect = element.getBoundingClientRect();
+  const style = getComputedStyle(element);
+
+  return (
+    rect.width > 0 &&
+    rect.height > 0 &&
+    style.display !== "none" &&
+    style.visibility !== "hidden" &&
+    style.opacity !== "0"
+  );
+}
+
+function invokeTalkdeskConfirm(button) {
+  const handler = getReactClickHandler(button);
+
+  if (!handler) return false;
+
+  try {
+    handler.call(undefined);
+    return true;
+  } catch (error) {
+    console.error(
+      "Talkdesk confirm routine failed:",
+      error
+    );
+
+    return false;
+  }
+}
 const observer = new MutationObserver(fixEndChatButton);
 
 observer.observe(document.body, {
@@ -319,8 +870,9 @@ observer.observe(document.body, {
 });
 
 fixEndChatButton();
+installEndChatConfirmationBridge();
 
-  </script>
+ </script>
 <!-- End of Talkdesk Code -->
 
 </body>
