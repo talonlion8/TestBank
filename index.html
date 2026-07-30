@@ -732,12 +732,15 @@ function handleTalkdeskConfirmationClick(event) {
   );
 }
 
-function waitForTalkdeskConfirmationToFinish(confirmContainer,confirmButton) {
+function waitForTalkdeskConfirmationToFinish(
+  confirmContainer,
+  confirmButton
+) {
   const startedAt = Date.now();
   const timeoutMs = 15000;
   let completed = false;
 
-  function finishWithMinimize(reason) {
+  function finishAndReload(reason) {
     if (completed) return;
 
     completed = true;
@@ -747,12 +750,11 @@ function waitForTalkdeskConfirmationToFinish(confirmContainer,confirmButton) {
     );
 
     /*
-     * Give Talkdesk's promise chain and stored conversation
-     * state a moment to finish before hiding the widget.
+     * Brief delay allows Talkdesk to store the ended state.
      */
     setTimeout(() => {
-      minimizeTalkdeskAfterEnd();
-    }, 750);
+      reloadTalkdeskWidgetUI();
+    }, 50);
   }
 
   function check() {
@@ -765,28 +767,17 @@ function waitForTalkdeskConfirmationToFinish(confirmContainer,confirmButton) {
     const currentAction =
       confirmButton?.getAttribute("aria-label");
 
-    /*
-     * Native success: Talkdesk removed the confirmation UI.
-     */
     if (!stillOpen) {
-      finishWithMinimize(
+      finishAndReload(
         "confirmation completed"
       );
-
       return;
     }
 
-    /*
-     * Premature-enabled state:
-     * Talkdesk records the ended conversation but leaves the
-     * current UI showing Try again. Minimize so reopening causes
-     * Talkdesk to reconstruct the UI from stored state.
-     */
     if (currentAction === "retry-action") {
-      finishWithMinimize(
+      finishAndReload(
         "Talkdesk entered retry state"
       );
-
       return;
     }
 
