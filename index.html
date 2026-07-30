@@ -304,33 +304,6 @@ function findTalkdeskHandler(startElement) {
   return null;
 }
 
-function findTalkdeskHandler(startElement) {
-  let element = startElement;
-
-  while (element) {
-    const props = getReactProps(element);
-
-    if (props) {
-      const handler =
-        props.onClick ||
-        props.onPointerDown ||
-        props.onMouseDown;
-
-      if (typeof handler === "function") {
-        return {
-          element,
-          handler,
-          props
-        };
-      }
-    }
-
-    element = element.parentElement;
-  }
-
-  return null;
-}
-
 function fixEndChatButton() {
   installEndChatStyles();
 
@@ -701,59 +674,58 @@ function invokeTalkdeskConfirm(button) {
 function handleTalkdeskConfirmationClick(event) {
   const path = event.composedPath();
 
-  const confirmButton = path.find((element) => {
-    return (
+  const confirmButton = path.find(
+    (element) =>
       element instanceof HTMLButtonElement &&
       element.getAttribute("aria-label") ===
         "confirm-action"
-    );
-  });
+  );
 
   if (!confirmButton) return;
 
-  const confirmContainer = path.find((element) => {
-    return (
+  const confirmContainer = path.find(
+    (element) =>
       element instanceof HTMLElement &&
       typeof element.className === "string" &&
       element.className.includes(
         "confirmEndChatContainer"
       )
-    );
-  });
+  );
 
   if (!confirmContainer) return;
 
-  /*
-   * Prevent the same Talkdesk confirm routine from being
-   * called once by us and once by React.
-   */
-  event.preventDefault();
-  event.stopPropagation();
-  event.stopImmediatePropagation();
-
   if (
-    confirmButton.dataset.customConfirmInvoked === "true"
+    confirmContainer.dataset.endChatWatcherActive ===
+    "true"
   ) {
     return;
   }
 
-  confirmButton.dataset.customConfirmInvoked = "true";
+  confirmContainer.dataset.endChatWatcherActive =
+    "true";
+
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
 
   console.log(
-    "Invoking Talkdesk's real confirm routine:",
-    confirmButton
+    "Invoking Talkdesk confirmation routine."
   );
 
   const invoked =
     invokeTalkdeskConfirm(confirmButton);
 
   if (!invoked) {
-    confirmButton.dataset.customConfirmInvoked = "false";
+    delete confirmContainer.dataset
+      .endChatWatcherActive;
 
     console.error(
-      "Talkdesk confirm routine could not be invoked."
+      "Talkdesk confirmation routine could not be invoked."
     );
+
+    return;
   }
+
   waitForTalkdeskConfirmationToFinish(
     confirmContainer,
     confirmButton
@@ -763,8 +735,29 @@ function handleTalkdeskConfirmationClick(event) {
 function waitForTalkdeskConfirmationToFinish(confirmContainer,confirmButton) {
   const startedAt = Date.now();
   const timeoutMs = 15000;
+  let completed = false;
+
+  function finishWithMinimize(reason) {
+    if (completed) return;
+
+    completed = true;
+
+    console.log(
+      `End-chat flow finished: ${reason}`
+    );
+
+    /*
+     * Give Talkdesk's promise chain and stored conversation
+     * state a moment to finish before hiding the widget.
+     */
+    setTimeout(() => {
+      minimizeTalkdeskAfterEnd();
+    }, 750);
+  }
 
   function check() {
+    if (completed) return;
+
     const stillOpen =
       confirmContainer.isConnected &&
       isElementVisible(confirmContainer);
@@ -773,31 +766,33 @@ function waitForTalkdeskConfirmationToFinish(confirmContainer,confirmButton) {
       confirmButton?.getAttribute("aria-label");
 
     /*
-     * Normal Talkdesk completion:
-     * confirmation disappeared.
+     * Native success: Talkdesk removed the confirmation UI.
      */
     if (!stillOpen) {
-      console.log(
-        "Talkdesk completed the end-chat transition normally."
+      finishWithMinimize(
+        "confirmation completed"
       );
 
       return;
     }
 
     /*
-     * Premature-enable behavior:
-     * backend appears ended, but Talkdesk UI shows Try again.
+     * Premature-enabled state:
+     * Talkdesk records the ended conversation but leaves the
+     * current UI showing Try again. Minimize so reopening causes
+     * Talkdesk to reconstruct the UI from stored state.
      */
     if (currentAction === "retry-action") {
-      console.log(
-        "Talkdesk entered retry state; refreshing widget state."
+      finishWithMinimize(
+        "Talkdesk entered retry state"
       );
 
-      refreshTalkdeskWidget();
       return;
     }
 
     if (Date.now() - startedAt >= timeoutMs) {
+      completed = true;
+
       console.error(
         "Talkdesk end-chat confirmation timed out."
       );
@@ -868,16 +863,28 @@ function isElementVisible(element) {
 }
 
 function invokeTalkdeskConfirm(button) {
-  const handler = getReactClickHandler(button);
+  const handler =
+    getReactClickHandler(button);
 
-  if (!handler) return false;
+  if (!handler) {
+    console.error(
+      "Talkdesk confirmation onClick was not found."
+    );
+
+    return false;
+  }
 
   try {
-    handler.call(undefined);
+    handler.call(button);
+
+    console.log(
+      "Talkdesk confirmation routine invoked."
+    );
+
     return true;
   } catch (error) {
     console.error(
-      "Talkdesk confirm routine failed:",
+      "Talkdesk confirmation routine failed:",
       error
     );
 
@@ -885,6 +892,37 @@ function invokeTalkdeskConfirm(button) {
   }
 }
 const observer = new MutationObserver(fixEndChatButton);
+
+function minimizeTalkdeskAfterEnd() {
+  try {
+    const close =
+      webchat?.selfHostedApp?.close;
+
+    if (typeof close !== "function") {
+      console.error(
+        "Talkdesk selfHostedApp.close is unavailable.",
+        webchat
+      );
+
+      return false;
+    }
+
+    close.call(webchat.selfHostedApp);
+
+    console.log(
+      "Talkdesk widget minimized after end-chat."
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Unable to minimize Talkdesk widget:",
+      error
+    );
+
+    return false;
+  }
+}
 
 observer.observe(document.body, {
   childList: true,
