@@ -41,7 +41,7 @@
     "tdWebchat",         
 
     { 
-        touchpointId: "e45f52f215284dc38da26cac65bdf30d", 
+        touchpointId: "1131e885298e4ad8b4a2d25fdf28a087", 
         accountId: "", 
         region: "td-us-1" 
     },         
@@ -754,9 +754,13 @@ function handleTalkdeskConfirmationClick(event) {
       "Talkdesk confirm routine could not be invoked."
     );
   }
+  waitForTalkdeskConfirmationToFinish(
+    confirmContainer,
+    confirmButton
+  );
 }
 
-function waitForTalkdeskConfirmationToFinish(confirmContainer) {
+function waitForTalkdeskConfirmationToFinish(confirmContainer,confirmButton) {
   const startedAt = Date.now();
   const timeoutMs = 15000;
 
@@ -765,12 +769,31 @@ function waitForTalkdeskConfirmationToFinish(confirmContainer) {
       confirmContainer.isConnected &&
       isElementVisible(confirmContainer);
 
+    const currentAction =
+      confirmButton?.getAttribute("aria-label");
+
+    /*
+     * Normal Talkdesk completion:
+     * confirmation disappeared.
+     */
     if (!stillOpen) {
       console.log(
-        "Talkdesk end-chat routine completed."
+        "Talkdesk completed the end-chat transition normally."
       );
 
-      closeTalkdeskWebChat();
+      return;
+    }
+
+    /*
+     * Premature-enable behavior:
+     * backend appears ended, but Talkdesk UI shows Try again.
+     */
+    if (currentAction === "retry-action") {
+      console.log(
+        "Talkdesk entered retry state; refreshing widget state."
+      );
+
+      refreshTalkdeskWidget();
       return;
     }
 
@@ -778,6 +801,7 @@ function waitForTalkdeskConfirmationToFinish(confirmContainer) {
       console.error(
         "Talkdesk end-chat confirmation timed out."
       );
+
       return;
     }
 
