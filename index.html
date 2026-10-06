@@ -22,54 +22,7 @@
       // @amazon-connect-touchpoint/web — https://www.npmjs.com/package/@amazon-connect-touchpoint/web
       import { create } from "https://unpkg.com/@amazon-connect-touchpoint/web/lib/index.js?module";
 
-      const START_CHAT_ENDPOINT =
-    "https://timj.my.connect.aws/connectwidget/api/bfcf9d64-b440-436b-8390-07b493e0512e/start";
-
-  const SNIPPET_ID =
-    "QVFJREFIaEZ5ZjhlbTkwTGlJQ0RQVlozbFpkalBOMm91NWh2aGNUZHZhTTZac1lEMndIT1pEMkhOS0x6bVVRb1psOXhoWG5jQUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNajZVWFBNakxmUUVtUGwzUkFnRVFnQ3ZzRDN2ZDJwVzF6YTZlRmNvTFBxYmw1TlVCTGM2RzdpSi9yVlpvaHhSU1ErcndvU1V3d0VLaitRdzE6Oml5NUtJSEh3eFJuSm9HQ21pcklDcC9LQXpUc2laUHJmYkJFMm9vNVZicTdDS3l3a0d6WlU1ZEZoWlBma2todHlMVU54SzZYUGFRRTk2SDl3OHViNzRkdEo0QlhGd0pabS9JNVJYb3Ztekg4VUZmZUg5aXRFOEJQMjBFZEMvQzEwOXlXZm9EMStnZCtaZFFnc1diZC9ZekEvRmE1Rk82WT0=";
-
-  /*
-   * Touchpoint calls the existing Amazon Connect Widget /start endpoint,
-   * but that endpoint expects x-amz-snippet-id.
-   *
-   * Intercept only that request and add the required header.
-   */
-  const originalFetch = window.fetch.bind(window);
-
-  window.fetch = async function(input, init = {}) {
-    const requestUrl =
-      typeof input === "string"
-        ? input
-        : input instanceof Request
-          ? input.url
-          : String(input);
-
-    if (requestUrl.startsWith(START_CHAT_ENDPOINT)) {
-      console.log("HD-Chat: intercepting StartChatContact request");
-
-      const headers = new Headers(
-        init.headers ||
-        (input instanceof Request ? input.headers : undefined)
-      );
-
-      headers.set("x-amz-snippet-id", SNIPPET_ID);
-
-      init = {
-        ...init,
-        headers
-      };
-    }
-
-    return originalFetch(input, init);
-  };
-
-  // Load Touchpoint AFTER the fetch wrapper exists.
-  await import(
-    "https://unpkg.com/@amazon-connect-touchpoint/web/lib/index.js?module"
-  );
-
-
-      const touchpointConfig = {
+          const touchpointConfig = {
         config: {
           chatEndpoint: START_CHAT_ENDPOINT,
           instanceId: "8ff06a42-6f88-4e35-8276-dcb687897ca3",
