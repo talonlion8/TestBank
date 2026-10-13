@@ -1,69 +1,78 @@
 <html lang="en">
-  <head>
-    <title>HD-Chat</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
+<head>
+  <title>HD-Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-      connect-touchpoint {
-        height: 100%;
-      } 
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
 
+    connect-touchpoint {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
 
-    </style>
-  </head>
+<body style="background-image: url('InfoCentral.png'); background-size: cover;">
+
+  <div
+    id="chat-container"
+    style="
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 800px;
+      height: 600px;
+      z-index: 9999;
+      overflow: hidden;
+    "
+  >
+    <connect-touchpoint></connect-touchpoint>
+  </div>
+
+  <a href="chat.html">Open Chat</a>
+
   <script type="module">
-      // @amazon-connect-touchpoint/web — https://www.npmjs.com/package/@amazon-connect-touchpoint/web
-      import { create } from "https://unpkg.com/@amazon-connect-touchpoint/web/lib/index.js?module";
+    import { create } from
+      "https://unpkg.com/@amazon-connect-touchpoint/web/lib/index.js?module";
 
-          const touchpointConfig = {
-        config: {
-          chatEndpoint: "https://5xcen08wbl.execute-api.us-east-1.amazonaws.com/Prod",
-          instanceId: "8ff06a42-6f88-4e35-8276-dcb687897ca3",
-          contactFlowId: "98f7bff4-70e6-4ce2-83fe-b7d40bc0ccdc",
-          participantDisplayName: "Customer",
-          region: "us-east-1"
-        },
-        languageCode: "en-US",
-        windowSize: "full",
-        colorMode: "dark",
-        input: "text",
-        theme: {
-          fontFamily: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
-          accent: "#AECAFF"
-        },
-        brandIcon: undefined,
-        liveSync: {
-          deploymentKey: "Zir9qLxkvwyrBBfaffawF",
-          apiKey: "_tXMaf-U4HGD6X7JcsDE9lWY"
-        }
-      };
+    const touchpointConfig = {
+      config: {
+        chatEndpoint: "https://5xcen08wbl.execute-api.us-east-1.amazonaws.com/Prod",
+        instanceId: "8ff06a42-6f88-4e35-8276-dcb687897ca3",
+        contactFlowId: "98f7bff4-70e6-4ce2-83fe-b7d40bc0ccdc",
+        participantDisplayName: "Customer",
+        region: "us-east-1"
+      },
 
-      document.querySelector("connect-touchpoint").touchpointConfiguration = touchpointConfig;   
+      languageCode: "en-US",
+      windowSize: "full",
+      colorMode: "dark",
+      input: "text",
 
+      theme: {
+        fontFamily:
+          "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        accent: "#AECAFF"
+      },
 
-       </script>
+      brandIcon: undefined,
 
-  <body style="background-image: url('InfoCentral.png'); background-size: cover;">
-    <div>style="
-       position: fixed;
-       right: 20px;
-       bottom: 20px;
-       width: 800px;
-       height: 600px;
-       z-index: 9999;
-       overflow: hidden;
-     "><connect-touchpoint /></div>
-    
-    
-    <a href="chat.html">Open Chat</a>
-  </body>
+      liveSync: {
+        deploymentKey: "Zir9qLxkvwyrBBfaffawF",
+        apiKey: "_tXMaf-U4HGD6X7JcsDE9lWY"
+      }
+    };
+
+    document.querySelector("connect-touchpoint")
+      .touchpointConfiguration = touchpointConfig;
+  </script>
+
+</body>
 </html>
-
-
-
