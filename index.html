@@ -232,6 +232,37 @@
     const touchpoint =
     document.querySelector("connect-touchpoint");
 
+window.hdConversationHandler = null;
+
+touchpoint.onRef = (ref) => {
+
+    console.log(
+        "HD-Chat: Touchpoint REF received",
+        ref
+    );
+
+    try {
+
+        const handler =
+            ref.getConversationHandler();
+
+        window.hdConversationHandler =
+            handler;
+
+        console.log(
+            "HD-Chat: Conversation Handler captured",
+            handler
+        );
+
+    } catch (error) {
+
+        console.error(
+            "HD-Chat: Could not get conversation handler",
+            error
+        );
+    }
+};
+
 touchpoint.touchpointConfiguration =
     touchpointConfig;
 };
