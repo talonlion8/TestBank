@@ -71,6 +71,33 @@
 
     }
 }
+
+    function chatClose() {
+    const touchpoint = document.querySelector("connect-touchpoint");
+
+    if (!touchpoint) {
+        console.warn("HD-Chat: connect-touchpoint not found");
+        return;
+    }
+
+    touchpoint.onClose = (event) => {
+        console.log("HD-Chat: Touchpoint Close clicked");
+
+        // Stop Touchpoint from performing its normal close behavior.
+        event.preventDefault();
+
+        /*
+         * Put the existing chatClose behavior here.
+         *
+         * For now this proves that we can intercept Amazon's
+         * built-in Close button without ending the conversation.
+         */
+
+        console.log("HD-Chat: default Touchpoint close prevented");
+
+        toggleChat();
+    };
+}
   </script>
 
 <body style="background-image: url('InfoCentral.png'); background-size: cover;">
@@ -126,7 +153,7 @@
     >&#8722;</button>
 
     <button
-        onclick="toggleChat()"
+        onclick="chatClose()"
         title="End Chat"
         style="
             width: 35px;
