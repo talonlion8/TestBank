@@ -128,29 +128,27 @@
     }
 
 
-   function chatClose() {
+  async function chatClose() {
 
-    console.log(
-        "HD-Chat: chatClose fired"
-    );
+    const handler = window.hdConversationHandler;
 
-    console.log(
-        "HD-Chat: conversation handler =",
-        window.hdConversationHandler
-    );
-
-    if (!window.hdConversationHandler) {
-
-        alert(
-            "Touchpoint found, but conversation handler is not active."
-        );
-
+    if (!handler) {
+        console.warn("HD-Chat: No active conversation");
         return;
     }
 
-    alert(
-        "SUCCESS - Active conversation handler found."
-    );
+    try {
+        // Send Close as a customer message to Agentic CX
+        await handler.sendText("Close");
+
+        console.log("HD-Chat: Close sent to Agentic CX");
+
+        // Minimize the chat back to the launcher icon
+        toggleChat();
+
+    } catch (error) {
+        console.error("HD-Chat: Failed to close conversation", error);
+    }
 }
   </script>
 
