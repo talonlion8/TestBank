@@ -39,7 +39,7 @@
 
     function chatClose() {
     const touchpoint = document.querySelector("connect-touchpoint");
-
+     toggleChat();
     if (!touchpoint) {
         console.warn("HD-Chat: connect-touchpoint not found");
         return;
@@ -60,7 +60,7 @@
 
         console.log("HD-Chat: default Touchpoint close prevented");        
     };
-      toggleChat();
+     
 }
   </script>
 <script type="module">
