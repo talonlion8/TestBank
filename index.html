@@ -20,38 +20,7 @@
 </head>
 
 <body style="background-image: url('InfoCentral.png'); background-size: cover;">
-<img id="chat-container-open" src="https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWT&oid=00D36000000rFTo&lastMod=1783723056000"
-  style="
-        width: 70px;
-        height: 70px;
-        cursor: pointer;
-        position: fixed;
-        right: 20px;
-        bottom: 20px;
-        z-index: 9998;
-    "
-    onclick="toggleChat()"
-  
-  >
-  <div
-    id="chat-container"
-    style="
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      width: 800px;
-      height: 600px;
-      z-index: 9999;
-      overflow: hidden;
-      display: none;
-    "
-  >
-    <connect-touchpoint></connect-touchpoint>
-  </div>
-</img>
-  <a href="chat.html">Open Chat</a>
-
-  <script type="module">
+<script type="module">
     import { create } from
       "https://unpkg.com/@amazon-connect-touchpoint/web/lib/index.js?module";
 
@@ -104,6 +73,35 @@
     }
 }
   </script>
-
+<img id="chat-container-open" src="https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWT&oid=00D36000000rFTo&lastMod=1783723056000"
+  style="
+        width: 80px;
+        height: 100px;
+        cursor: pointer;
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9998;
+    "
+    onclick="toggleChat()"
+  
+  >
+  <div
+    id="chat-container"
+    style="
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 800px;
+      height: 600px;
+      z-index: 9999;
+      overflow: hidden;
+      display: none;
+    "
+  >
+    <connect-touchpoint></connect-touchpoint>
+  </div>
+</img>
+  <a href="chat.html">Open Chat</a>
 </body>
 </html>
