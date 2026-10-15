@@ -40,10 +40,7 @@
     function chatClose() {
     const touchpoint = document.querySelector("connect-touchpoint");
      toggleChat();
-    if (!touchpoint) {
-        console.warn("HD-Chat: connect-touchpoint not found");
-        return;
-    }
+    
 
     touchpoint.onClose = (event) => {
         console.log("HD-Chat: Touchpoint Close clicked");
