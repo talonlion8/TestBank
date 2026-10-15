@@ -132,7 +132,7 @@
 
     const handler = window.hdConversationHandler;
 
-    if (!handler) {
+        if (!handler) {
         console.warn("HD-Chat: No active conversation");
         return;
     }
@@ -158,6 +158,43 @@
             error
         );
     }
+   // Watch the conversation for its actual end state
+handler.subscribe((responses) => {
+
+    if (!Array.isArray(responses)) {
+        return;
+    }
+
+    const conversationEnded = responses.some(
+        (response) =>
+            response.type === "notice" &&
+            response.conversationEnded === true
+    );
+
+    if (!conversationEnded) {
+        return;
+    }
+
+    console.log(
+        "HD-Chat: Conversation ended - collapsing chat"
+    );
+
+    const chat =
+        document.getElementById("chat-container");
+
+    const openButton =
+        document.getElementById("chat-container-open");
+
+    // Collapse HD-Chat only after Connect reports
+    // that the conversation has actually ended.
+    if (chat) {
+        chat.style.display = "none";
+    }
+
+    if (openButton) {
+        openButton.style.display = "block";
+    }
+});
 }
   </script>
 
