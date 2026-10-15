@@ -20,7 +20,19 @@
 </head>
 
 <body style="background-image: url('InfoCentral.png'); background-size: cover;">
-
+<img id="chat-container-open" src="https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWT&oid=00D36000000rFTo&lastMod=1783723056000"
+  style="
+        width: 70px;
+        height: 70px;
+        cursor: pointer;
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9998;
+    "
+    onclick="toggleChat()"
+  
+  >
   <div
     id="chat-container"
     style="
@@ -36,7 +48,7 @@
   >
     <connect-touchpoint></connect-touchpoint>
   </div>
-
+</img>
   <a href="chat.html">Open Chat</a>
 
   <script type="module">
@@ -73,6 +85,24 @@
 
     document.querySelector("connect-touchpoint")
       .touchpointConfiguration = touchpointConfig;
+
+    function toggleChat() {
+
+    const chat = document.getElementById("chat-container");
+    const openButton = document.getElementById("chat-container-open");
+
+    if (chat.style.display === "none") {
+
+        chat.style.display = "block";
+        openButton.style.display = "none";
+
+    } else {
+
+        chat.style.display = "none";
+        openButton.style.display = "block";
+
+    }
+}
   </script>
 
 </body>
