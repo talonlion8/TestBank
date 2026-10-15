@@ -128,49 +128,30 @@
     }
 
 
-    function chatClose() {
+   function chatClose() {
 
-      alert("1 - chatClose entered");
+    console.log(
+        "HD-Chat: chatClose fired"
+    );
 
-      console.log(
-        "1 - chatClose entered"
-      );
+    console.log(
+        "HD-Chat: conversation handler =",
+        window.hdConversationHandler
+    );
 
-      const touchpoint =
-        document.querySelector("connect-touchpoint");
-
-      alert(
-        "2 - touchpoint element = " +
-        (touchpoint ? "FOUND" : "NOT FOUND")
-      );
-
-      console.log(
-        "2 - touchpoint element:",
-        touchpoint
-      );
-
-      if (!touchpoint) {
+    if (!window.hdConversationHandler) {
 
         alert(
-          "STOP - connect-touchpoint not found"
+            "Touchpoint found, but conversation handler is not active."
         );
 
         return;
-      }
-
-      alert(
-        "3 - about to inspect onClose"
-      );
-
-      console.log(
-        "3 - current touchpoint.onClose:",
-        touchpoint.onClose
-      );
-
-      alert(
-        "4 - chatClose finished"
-      );
     }
+
+    alert(
+        "SUCCESS - Active conversation handler found."
+    );
+}
   </script>
 
 
@@ -248,8 +229,42 @@
     );
 
 
-    touchpoint.touchpointConfiguration =
-      touchpointConfig;
+    const touchpoint =
+    document.querySelector("connect-touchpoint");
+
+window.hdConversationHandler = null;
+
+touchpoint.onRef = (ref) => {
+
+    console.log(
+        "HD-Chat: Touchpoint REF received",
+        ref
+    );
+
+    try {
+
+        const handler =
+            ref.getConversationHandler();
+
+        window.hdConversationHandler =
+            handler;
+
+        console.log(
+            "HD-Chat: Conversation Handler captured",
+            handler
+        );
+
+    } catch (error) {
+
+        console.error(
+            "HD-Chat: Could not get conversation handler",
+            error
+        );
+    }
+};
+
+touchpoint.touchpointConfiguration =
+    touchpointConfig;
 
   </script>
 
