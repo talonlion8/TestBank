@@ -100,15 +100,20 @@
       display: none;
     "
   >
-    <!-- Minimize Button -->
+    <!-- Close and Minimize Button -->
+    <div style="
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10000;
+">
+
     <button
         onclick="toggleChat()"
-        aria-label="Minimize Chat"
         title="Minimize Chat"
         style="
-            position: absolute;
-            top: 10px;
-            right: 40px;
             width: 35px;
             height: 35px;
             border: none;
@@ -117,16 +122,13 @@
             color: white;
             font-size: 24px;
             cursor: pointer;
-            z-index: 10000;
         "
     >&#8722;</button>
-     <!-- Close -->
+
     <button
         onclick="toggleChat()"
         title="End Chat"
         style="
-            top: 10px;
-            right: 80px;
             width: 35px;
             height: 35px;
             border: none;
@@ -137,6 +139,8 @@
             cursor: pointer;
         "
     >×</button>
+
+</div>
     <connect-touchpoint></connect-touchpoint>
   </div>
 </img>
