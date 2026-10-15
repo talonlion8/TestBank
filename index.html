@@ -37,31 +37,38 @@
     }
 }
 
-    function chatClose() {
-    const touchpoint = document.querySelector("connect-touchpoint");
-     toggleChat();
+  function closeChat() {
+
+    alert("1 - closeChat entered");
+
+    console.log("1 - closeChat entered");
+
+    const touchpoint =
+        document.querySelector("connect-touchpoint");
+
+    alert(
+        "2 - touchpoint element = " +
+        (touchpoint ? "FOUND" : "NOT FOUND")
+    );
+
+    console.log("2 - touchpoint element:", touchpoint);
+
     if (!touchpoint) {
-        console.warn("HD-Chat: connect-touchpoint not found");
+        alert("STOP - connect-touchpoint not found");
         return;
     }
 
-    touchpoint.onClose = (event) => {
-        console.log("HD-Chat: Touchpoint Close clicked");
+    alert("3 - about to inspect onClose");
 
-        // Stop Touchpoint from performing its normal close behavior.
-        event.preventDefault();
+    console.log(
+        "3 - current touchpoint.onClose:",
+        touchpoint.onClose
+    );
 
-        /*
-         * Put the existing chatClose behavior here.
-         *
-         * For now this proves that we can intercept Amazon's
-         * built-in Close button without ending the conversation.
-         */
-
-        console.log("HD-Chat: default Touchpoint close prevented");        
-    };
-     
+    alert("4 - closeChat finished");
 }
+   
+
   </script>
 <script type="module">
     import { create } from
