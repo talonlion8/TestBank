@@ -128,7 +128,7 @@
     }
 
 
-  async function chatClose() {
+ async function chatClose() {
 
     const handler = window.hdConversationHandler;
 
@@ -138,16 +138,25 @@
     }
 
     try {
-        // Send Close as a customer message to Agentic CX
+
+        // Send Close as a real customer utterance.
+        // Agentic CX will route this to the Close flow.
         await handler.sendText("Close");
 
-        console.log("HD-Chat: Close sent to Agentic CX");
+        console.log(
+            "HD-Chat: Close sent to Agentic CX"
+        );
 
-        // Minimize the chat back to the launcher icon
-        toggleChat();
+        // Do NOT hide the chat here.
+        // Leave it open so the customer can provide
+        // their email address for the survey.
 
     } catch (error) {
-        console.error("HD-Chat: Failed to close conversation", error);
+
+        console.error(
+            "HD-Chat: Failed to send Close",
+            error
+        );
     }
 }
   </script>
