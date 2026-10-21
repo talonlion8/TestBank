@@ -4,13 +4,20 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
+  <title>NYL AI Assistant</title>
+
+  <!-- Crescendo Stylesheet -->
   <link
     href="https://cdn.crescendo.ai/bot-widget/latest/enegelaibot.css"
     rel="stylesheet"
   >
 
   <style>
+
+    /* Crescendo Widget Styling */
     enegelai-bot {
       --enegelai-bot-header-background: rgba(5,105,255,1);
       --enegelai-bot-header-color: white;
@@ -29,12 +36,15 @@
 
       --enegelai-bot-popup-min-height: 200px;
     }
-    enegelai-bot::part(anchor) {
-    opacity: 0 !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-}
 
+    /* Hide Crescendo's Default Launcher */
+    enegelai-bot::part(anchor) {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    /* Custom NYL Launcher */
     #chat-container-open {
       width: 80px;
       height: 100px;
@@ -42,77 +52,243 @@
       right: 0;
       top: 55%;
       transform: translateY(-50%);
+
       background: transparent;
       padding: 0;
       margin: 0;
       border: none;
+
       z-index: 9998;
       cursor: pointer;
     }
+
   </style>
 
+  <!-- Crescendo Widget Library -->
   <script
     src="https://cdn.crescendo.ai/bot-widget/latest/enegelaibot.umd.js"
     defer>
   </script>
+
 </head>
 
 <body>
 
-  <!-- Your custom launcher -->
+  <!-- Custom NYL Chat Icon -->
   <img
     id="chat-container-open"
     src="https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWT&amp;oid=00D36000000rFTo&amp;lastMod=1783723056000"
     alt="Open NYL AI Assistant"
+    role="button"
+    tabindex="0"
   >
 
-  <!-- Crescendo widget container -->
+  <!-- Crescendo Widget Container -->
   <div id="Chat-Container"></div>
 
   <script>
     (function () {
 
-      // Create Crescendo widget
-      const el = document.createElement("enegelai-bot");
+      // ========================================
+      // 1. CREATE CRESCENDO BOT
+      // ========================================
 
-      el.id = "Chat-Bot";
+      const bot = document.createElement("enegelai-bot");
 
-      el.setAttribute("name", "NYL AI Assistant");
-      el.setAttribute("url", "cxm-edge.crescendo.ai");
-      el.setAttribute("org-id", "newyorklife");
-      el.setAttribute("bot-id", "newyorklife-chat-81897630");
+      bot.id = "Chat-Bot";
 
-      el.setAttribute(
+      bot.setAttribute("name", "NYL AI Assistant");
+      bot.setAttribute("url", "cxm-edge.crescendo.ai");
+      bot.setAttribute("org-id", "newyorklife");
+      bot.setAttribute("bot-id", "newyorklife-chat-81897630");
+
+      // Replace with your full logo URL
+      bot.setAttribute(
         "logo-url",
         "YOUR_FULL_LOGO_URL"
       );
 
-      document.getElementById("Chat-Container").appendChild(el);
+      document
+        .getElementById("Chat-Container")
+        .appendChild(bot);
 
-      // Open chat from custom image
-      document.getElementById("chat-container-open").addEventListener("click", function () {
+      const customIcon =
+        document.getElementById("chat-container-open");
 
-          const bot = document.getElementById("Chat-Bot");
 
-          const launcher = bot?.shadowRoot
-            ?.querySelector("cb-anchor")
-            ?.shadowRoot
-            ?.querySelector(".anchor-button");
+      // ========================================
+      // 2. OPEN CHAT FROM CUSTOM IMAGE
+      // ========================================
 
-          if (launcher) {
-            launcher.click();
-            console.log("Crescendo launcher clicked");
-            if (document.getElementById("chat-container-open").display === 'block'){
-              document.getElementById("chat-container-open").display = 'none';
-            } else {
-              document.getElementById("chat-container-open").display = 'block';
-                }
-          } else {
-            console.warn("Crescendo launcher not ready");
-          }      
-          
+      function openCrescendoChat() {
+
+        const launcher = bot.shadowRoot
+          ?.querySelector("cb-anchor")
+          ?.shadowRoot
+          ?.querySelector(".anchor-button");
+
+        if (launcher) {
+
+          launcher.click();
+
+          console.log("Crescendo launcher clicked");
+
+        } else {
+
+          console.warn("Crescendo launcher not ready");
+
+        }
+      }
+
+      customIcon.addEventListener(
+        "click",
+        openCrescendoChat
+      );
+
+      // Keyboard accessibility
+      customIcon.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openCrescendoChat();
+        }
+      });
+
+
+      // ========================================
+      // 3. MONITOR CHAT OPEN / MINIMIZED STATE
+      // ========================================
+
+      let wrapperObserver = null;
+      let currentWrapper = null;
+
+      function updateIconVisibility() {
+
+        const wrapper = bot.shadowRoot
+          ?.querySelector(".cb-wrapper");
+
+        if (!wrapper) {
+          return;
+        }
+
+        const isOpen =
+          wrapper.classList.contains("cb-open");
+
+        // Hide custom icon when chat is open
+        // Show custom icon when chat is minimized
+        customIcon.style.display =
+          isOpen ? "none" : "block";
+
+        console.log("Crescendo chat open:", isOpen);
+      }
+
+
+      // ========================================
+      // 4. OBSERVE CRESCENDO WRAPPER
+      // ========================================
+
+      function observeWrapper() {
+
+        const wrapper = bot.shadowRoot
+          ?.querySelector(".cb-wrapper");
+
+        if (!wrapper) {
+          return;
+        }
+
+        // Avoid duplicate observers
+        if (wrapper === currentWrapper) {
+          return;
+        }
+
+        // Disconnect old wrapper observer
+        if (wrapperObserver) {
+          wrapperObserver.disconnect();
+        }
+
+        currentWrapper = wrapper;
+
+        // Watch for cb-open class changes
+        wrapperObserver = new MutationObserver(
+          updateIconVisibility
+        );
+
+        wrapperObserver.observe(wrapper, {
+          attributes: true,
+          attributeFilter: ["class"]
         });
-       
+
+        updateIconVisibility();
+      }
+
+
+      // ========================================
+      // 5. WATCH FOR WIDGET RENDERING
+      // ========================================
+
+      function initializeObserver() {
+
+        if (!bot.shadowRoot) {
+          setTimeout(initializeObserver, 200);
+          return;
+        }
+
+        // Watch for wrapper replacements
+        const rootObserver = new MutationObserver(
+          observeWrapper
+        );
+
+        rootObserver.observe(bot.shadowRoot, {
+          childList: true,
+          subtree: true
+        });
+
+        // Observe current wrapper immediately
+        observeWrapper();
+      }
+
+      initializeObserver();
+
+
+      // ========================================
+      // 6. HIDE ORIGINAL CRESCENDO ANCHOR
+      // ========================================
+
+      function hideOriginalAnchor() {
+
+        const root = bot.shadowRoot;
+
+        if (!root) {
+          return;
+        }
+
+        // Add a persistent CSS rule inside
+        // Crescendo's Shadow DOM
+        const style = document.createElement("style");
+
+        style.textContent = `
+          cb-anchor {
+            opacity: 0 !important;
+            pointer-events: none !important;
+          }
+        `;
+
+        root.appendChild(style);
+
+        console.log("Original Crescendo launcher hidden");
+      }
+
+      function waitForAnchor() {
+
+        if (!bot.shadowRoot) {
+          setTimeout(waitForAnchor, 200);
+          return;
+        }
+
+        hideOriginalAnchor();
+      }
+
+      waitForAnchor();
+
     })();
   </script>
 
