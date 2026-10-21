@@ -87,14 +87,10 @@
         "YOUR_FULL_LOGO_URL"
       );
 
-      document
-        .getElementById("Chat-Container")
-        .appendChild(el);
+      document.getElementById("Chat-Container").appendChild(el);
 
       // Open chat from custom image
-      document
-        .getElementById("chat-container-open")
-        .addEventListener("click", function () {
+      document.getElementById("chat-container-open").addEventListener("click", function () {
 
           const bot = document.getElementById("Chat-Bot");
 
@@ -106,12 +102,17 @@
           if (launcher) {
             launcher.click();
             console.log("Crescendo launcher clicked");
+            if (document.getElementById("chat-container-open").display === 'block'){
+              document.getElementById("chat-container-open").display = 'none';
+            } else {
+              document.getElementById("chat-container-open").display = 'block';
+                }
           } else {
             console.warn("Crescendo launcher not ready");
-          }
-
+          }      
+          
         });
-
+       
     })();
   </script>
 
