@@ -37,8 +37,9 @@
       border: none;
       z-index: 9998;
       cursor: pointer;
+      onclick =toggleChat();
     ">
-    <div id="Chat-Container">
+    <div id="Chat-Container" style="display: none;">
    <link href="https://cdn.crescendo.ai/bot-widget/latest/enegelaibot.css" rel="stylesheet"> 
       <script>
     (function() {
@@ -50,6 +51,22 @@
         el.setAttribute('logo-url', 'https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWR&oid=00D36000000rFTo&%E2%80%A6');
         document.getElementById("Chat-Container").appendChild(el);
     })();
+
+        function toggleChat() {
+
+      const chat =
+        document.getElementById("Chat-Container");      
+
+      if (chat.style.display === "none") {
+
+        chat.style.display = "block";        
+
+      } else {
+
+        chat.style.display = "none";        
+
+      }
+    }
 </script>
       </div></img>
   </body>
