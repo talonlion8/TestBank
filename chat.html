@@ -45,7 +45,8 @@
    <link href="https://cdn.crescendo.ai/bot-widget/latest/enegelaibot.css" rel="stylesheet"> 
       <script>
     (function() {
-        const el = document.createElement('enegelai-bot');
+        var el = document.createElement('enegelai-bot');
+        el.id="Chat-Bot";
         el.setAttribute('name', 'NYL AI Assistant');
         el.setAttribute('url', 'cxm-edge.crescendo.ai');
         el.setAttribute('org-id', 'newyorklife');
@@ -59,17 +60,17 @@
       const chat =
         document.getElementById("Chat-Container"); 
 
-      <!--"const bot = document.getElementByName('enegelai-bot');"--!>      
+      "const bot = document.getElementById('Chat-Bot');"      
 
       if (chat.style.display === "none") {
 
         chat.style.display = "block";
-        el.style.display = "block";
+        bot.style.display = "block";
 
       } else {
 
         chat.style.display = "none";        
-        el.style.display = "none";
+        bot.style.display = "none";
       }
     }
 </script>
