@@ -1,33 +1,38 @@
-<html>
-  <head></head>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <link
+    href="https://cdn.crescendo.ai/bot-widget/latest/enegelaibot.css"
+    rel="stylesheet"
+  >
+
   <style>
-        enegelai-bot {
-        --enegelai-bot-header-background: rgba(5, 105, 255, 1.00);
-        --enegelai-bot-header-color: rgba(255, 255, 255, 1.00);
-        --enegelai-bot-message-user-background: rgba(250, 250, 250, 1.00);
-        --enegelai-bot-message-user-color: rgba(0, 0, 0, 1.00);
-        --enegelai-bot-message-bot-background: rgba(250, 250, 250, 1.00);
-        --enegelai-bot-message-bot-color: rgba(0, 0, 0, 1.00);
-        --enegelai-bot-anchor-background: rgba(5, 105, 255, 1.00);
-        --enegelai-bot-anchor-border-color: rgba(5, 105, 255, 1.00);
-        --enegelai-bot-form-submit-background: rgba(5, 105, 255, 1.00);
-        --enegelai-bot-form-submit-border: rgba(5, 105, 255, 1.00);
-        --enegelai-bot-popup-min-height: 200px;
-          display: none;
+    enegelai-bot {
+      --enegelai-bot-header-background: rgba(5,105,255,1);
+      --enegelai-bot-header-color: white;
+
+      --enegelai-bot-message-user-background: #fafafa;
+      --enegelai-bot-message-user-color: black;
+
+      --enegelai-bot-message-bot-background: #fafafa;
+      --enegelai-bot-message-bot-color: black;
+
+      --enegelai-bot-anchor-background: #0569ff;
+      --enegelai-bot-anchor-border-color: #0569ff;
+
+      --enegelai-bot-form-submit-background: #0569ff;
+      --enegelai-bot-form-submit-border: #0569ff;
+
+      --enegelai-bot-popup-min-height: 200px;
     }
 
-
-  </style>
-  <script src="https://cdn.crescendo.ai/bot-widget/latest/enegelaibot.umd.js" type="text/javascript" async></script> 
-
-
-  <body>
-  <img
-    id="chat-container-open"
-    src="https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWT&oid=00D36000000rFTo&lastMod=1783723056000"
-    style="
+    #chat-container-open {
       width: 80px;
-      Height: 100px;
+      height: 100px;
       position: fixed;
       right: 0;
       top: 55%;
@@ -37,58 +42,73 @@
       margin: 0;
       border: none;
       z-index: 9998;
-      cursor: pointer;      
-    "
-    onclick ="toggleChat()"
-    >
-    <div id="Chat-Container" style="display: none;">
-   <link href="https://cdn.crescendo.ai/bot-widget/latest/enegelaibot.css" rel="stylesheet"> 
-      <script>
-    (function() {
-        var el = document.createElement('enegelai-bot');
-        el.id="Chat-Bot";
-        el.setAttribute('name', 'NYL AI Assistant');
-        el.setAttribute('url', 'cxm-edge.crescendo.ai');
-        el.setAttribute('org-id', 'newyorklife');
-        el.setAttribute('bot-id', 'newyorklife-chat-81897630');
-        el.setAttribute('logo-url', 'https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWR&oid=00D36000000rFTo&%E2%80%A6');
-        document.getElementById("Chat-Container").appendChild(el);
-
-       document.getElementById("chat-container-open")
-     .addEventListener("click", function () {
-
-    const bot = document.getElementById("Chat-Bot");
-
-    const launcher = bot.shadowRoot
-      .querySelector("cb-anchor")
-      ?.shadowRoot
-      ?.querySelector(".anchor-button");
-
-    launcher?.click();
-  });
-    })();
-
-  
-
-        function toggleChat() {
-
-      const chat =
-        document.getElementById("Chat-Container"); 
-
-      const bot = document.getElementById('Chat-Bot');     
-
-      if (chat.style.display === "none") {
-
-        chat.style.display = "block";        
-
-      } else {
-
-        chat.style.display = "none";       
-        
-      }
+      cursor: pointer;
     }
-</script>
-      </div></img>
-  </body>
-    
+  </style>
+
+  <script
+    src="https://cdn.crescendo.ai/bot-widget/latest/enegelaibot.umd.js"
+    defer>
+  </script>
+</head>
+
+<body>
+
+  <!-- Your custom launcher -->
+  <img
+    id="chat-container-open"
+    src="https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWT&amp;oid=00D36000000rFTo&amp;lastMod=1783723056000"
+    alt="Open NYL AI Assistant"
+  >
+
+  <!-- Crescendo widget container -->
+  <div id="Chat-Container"></div>
+
+  <script>
+    (function () {
+
+      // Create Crescendo widget
+      const el = document.createElement("enegelai-bot");
+
+      el.id = "Chat-Bot";
+
+      el.setAttribute("name", "NYL AI Assistant");
+      el.setAttribute("url", "cxm-edge.crescendo.ai");
+      el.setAttribute("org-id", "newyorklife");
+      el.setAttribute("bot-id", "newyorklife-chat-81897630");
+
+      el.setAttribute(
+        "logo-url",
+        "YOUR_FULL_LOGO_URL"
+      );
+
+      document
+        .getElementById("Chat-Container")
+        .appendChild(el);
+
+      // Open chat from custom image
+      document
+        .getElementById("chat-container-open")
+        .addEventListener("click", function () {
+
+          const bot = document.getElementById("Chat-Bot");
+
+          const launcher = bot?.shadowRoot
+            ?.querySelector("cb-anchor")
+            ?.shadowRoot
+            ?.querySelector(".anchor-button");
+
+          if (launcher) {
+            launcher.click();
+            console.log("Crescendo launcher clicked");
+          } else {
+            console.warn("Crescendo launcher not ready");
+          }
+
+        });
+
+    })();
+  </script>
+
+</body>
 </html>
