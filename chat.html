@@ -53,7 +53,22 @@
         el.setAttribute('bot-id', 'newyorklife-chat-81897630');
         el.setAttribute('logo-url', 'https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWR&oid=00D36000000rFTo&%E2%80%A6');
         document.getElementById("Chat-Container").appendChild(el);
+
+       document.getElementById("chat-container-open")
+     .addEventListener("click", function () {
+
+    const bot = document.getElementById("Chat-Bot");
+
+    const launcher = bot.shadowRoot
+      .querySelector("cb-anchor")
+      ?.shadowRoot
+      ?.querySelector(".anchor-button");
+
+    launcher?.click();
+  });
     })();
+
+  
 
         function toggleChat() {
 
