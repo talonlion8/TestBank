@@ -297,6 +297,72 @@
       }
 
       waitForAnchor();
+    
+(function manageStartupWelcome() {
+  let initialWelcome = null;
+  let completed = false;
+
+  function findMessageList(root) {
+    if (!root) return null;
+
+    const direct = root.querySelector("cb-message-list");
+    if (direct) return direct;
+
+    for (const el of root.querySelectorAll("*")) {
+      if (el.shadowRoot) {
+        const found = findMessageList(el.shadowRoot);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  function updateWelcome() {
+    if (completed) return;
+
+    const list = findMessageList(bot.shadowRoot);
+    const root = list?.shadowRoot;
+    if (!root) return;
+
+    const form = root.querySelector("form.cb-input-form");
+    const messages = [...root.querySelectorAll("cb-message")];
+
+    if (form) {
+      if (!initialWelcome && messages.length) {
+        initialWelcome = messages[0];
+      }
+
+      if (initialWelcome) {
+        initialWelcome.style.display = "none";
+      }
+    } else if (initialWelcome) {
+      // Form is no longer displayed.
+      // Keep first welcome hidden; show subsequent messages.
+      initialWelcome.style.display = "none";
+      completed = true;
+    }
+  }
+
+  function startMonitoring() {
+    const list = findMessageList(bot.shadowRoot);
+
+    if (!list?.shadowRoot) {
+      setTimeout(startMonitoring, 200);
+      return;
+    }
+
+    const observer = new MutationObserver(updateWelcome);
+
+    observer.observe(list.shadowRoot, {
+      childList: true,
+      subtree: true
+    });
+
+    updateWelcome();
+  }
+
+  startMonitoring();
+})();
 
     })();
   </script>
