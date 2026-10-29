@@ -445,13 +445,53 @@
           );
 
           listObserver.observe(root, {
-            childList: true,
-            subtree: true
-          });
+  childList: true,
+  subtree: true
+});
 
-          updateWelcome();
-        }
+// Watch each message's Shadow DOM as it renders.
+// Crescendo may populate the text after creating cb-message.
 
+const messageObservers = new WeakMap();
+
+function watchMessages() {
+  const messages = root.querySelectorAll("cb-message");
+
+  messages.forEach(message => {
+    if (messageObservers.has(message)) return;
+
+    if (message.shadowRoot) {
+      const observer = new MutationObserver(() => {
+        updateWelcome();
+      });
+
+      observer.observe(message.shadowRoot, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+
+      messageObservers.set(message, observer);
+    }
+  });
+}
+
+// Observe newly added message components.
+const originalUpdate = updateWelcome;
+
+listObserver.disconnect();
+
+listObserver = new MutationObserver(() => {
+  watchMessages();
+  originalUpdate();
+});
+
+listObserver.observe(root, {
+  childList: true,
+  subtree: true
+});
+
+watchMessages();
         startMonitoring();
 
       })();
