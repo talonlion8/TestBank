@@ -298,71 +298,164 @@
 
       waitForAnchor();
     
-(function manageStartupWelcome() {
-  let initialWelcome = null;
-  let completed = false;
 
-  function findMessageList(root) {
-    if (!root) return null;
+      // ========================================
+      // 7. MANAGE STARTUP WELCOME - FAST VERSION
+      // ========================================
 
-    const direct = root.querySelector("cb-message-list");
-    if (direct) return direct;
+      (function manageStartupWelcome() {
 
-    for (const el of root.querySelectorAll("*")) {
-      if (el.shadowRoot) {
-        const found = findMessageList(el.shadowRoot);
-        if (found) return found;
-      }
-    }
-    return null;
-  }
+        const WELCOME_PREFIX =
+          "Hi, I’m NYL Agent Help Desk Concierge";
 
-  function updateWelcome() {
-    if (completed) return;
+        let initialWelcome = null;
+        let formSeen = false;
+        let formSubmitted = false;
+        let welcomeReleased = false;
 
-    const list = findMessageList(bot.shadowRoot);
-    const root = list?.shadowRoot;
-    if (!root) return;
+        let observedRoot = null;
+        let listObserver = null;
 
-    const form = root.querySelector("form.cb-input-form");
-    const messages = [...root.querySelectorAll("cb-message")];
+        function findMessageList(root) {
+          if (!root) return null;
 
-    if (form) {
-      if (!initialWelcome && messages.length) {
-        initialWelcome = messages[0];
-      }
+          const direct = root.querySelector("cb-message-list");
+          if (direct) return direct;
 
-      if (initialWelcome) {
-        initialWelcome.style.display = "none";
-      }
-    } else if (initialWelcome) {
-      // Form is no longer displayed.
-      // Keep first welcome hidden; show subsequent messages.
-      initialWelcome.style.display = "none";
-      completed = true;
-    }
-  }
+          for (const el of root.querySelectorAll("*")) {
+            if (el.shadowRoot) {
+              const found = findMessageList(el.shadowRoot);
+              if (found) return found;
+            }
+          }
 
-  function startMonitoring() {
-    const list = findMessageList(bot.shadowRoot);
+          return null;
+        }
 
-    if (!list?.shadowRoot) {
-      setTimeout(startMonitoring, 200);
-      return;
-    }
+        function getMessageText(message) {
+          if (!message?.shadowRoot) return "";
 
-    const observer = new MutationObserver(updateWelcome);
+          return (
+            message.shadowRoot.querySelector(
+              ".cb-message-copy-text"
+            )?.textContent || ""
+          ).trim();
+        }
 
-    observer.observe(list.shadowRoot, {
-      childList: true,
-      subtree: true
-    });
+        function isWelcome(message) {
+          return getMessageText(message).includes(
+            WELCOME_PREFIX
+          );
+        }
 
-    updateWelcome();
-  }
+        function updateWelcome() {
+          const root = observedRoot;
+          if (!root) return;
 
-  startMonitoring();
-})();
+          const form = root.querySelector(
+            "form.cb-input-form"
+          );
+
+          const messages = [
+            ...root.querySelectorAll("cb-message")
+          ];
+
+          if (form) {
+            formSeen = true;
+
+            if (!initialWelcome) {
+              initialWelcome =
+                messages.find(isWelcome) || null;
+            }
+
+            if (initialWelcome && !welcomeReleased) {
+              initialWelcome.style.display = "none";
+            }
+
+            return;
+          }
+
+          // Reveal first welcome after form completion.
+          if (
+            formSeen &&
+            formSubmitted &&
+            !welcomeReleased &&
+            initialWelcome
+          ) {
+            initialWelcome.style.display = "";
+            welcomeReleased = true;
+
+            console.log(
+              "Original welcome revealed after form"
+            );
+          }
+
+          // Suppress only matching duplicate welcomes.
+          if (welcomeReleased) {
+            for (const message of messages) {
+              if (message === initialWelcome) continue;
+
+              if (isWelcome(message)) {
+                message.style.display = "none";
+                console.log(
+                  "Duplicate welcome suppressed"
+                );
+              }
+            }
+          }
+        }
+
+        function startMonitoring() {
+          const list = findMessageList(bot.shadowRoot);
+          const root = list?.shadowRoot;
+
+          if (!root) {
+            setTimeout(startMonitoring, 200);
+            return;
+          }
+
+          if (root === observedRoot) return;
+
+          if (listObserver) {
+            listObserver.disconnect();
+          }
+
+          observedRoot = root;
+
+          // Track form submission.
+          root.addEventListener(
+            "submit",
+            event => {
+              if (
+                event.target?.matches?.(
+                  "form.cb-input-form"
+                )
+              ) {
+                formSubmitted = true;
+                console.log(
+                  "Contact form submission detected"
+                );
+              }
+            },
+            true
+          );
+
+          listObserver = new MutationObserver(
+            updateWelcome
+          );
+
+          listObserver.observe(root, {
+            childList: true,
+            subtree: true
+          });
+
+          updateWelcome();
+        }
+
+        startMonitoring();
+
+      })();
+
 
     })();
   </script>
