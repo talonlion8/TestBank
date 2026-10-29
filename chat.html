@@ -491,11 +491,14 @@ listObserver.observe(root, {
   subtree: true
 });
 
-watchMessages();
-        startMonitoring();
+        watchMessages();
 
-      })();
+      } // End startMonitoring()
 
+      // Start monitoring once
+      startMonitoring();
+
+      })();  
 
     })();
   </script>
