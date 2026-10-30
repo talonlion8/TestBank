@@ -111,11 +111,8 @@
       bot.setAttribute("org-id", "newyorklife");
       bot.setAttribute("bot-id", "newyorklife-chat-81897630");
 
-      // Replace with your full logo URL
-      bot.setAttribute(
-        "logo-url",
-        "https://nylic.my.salesforce.com/servlet/servlet.ImageServer?id=015Hq000006qZWR&oid=00D36000000rFTo&…"
-      );
+      // Optional: add a complete logo-url attribute when available.
+      // The previously supplied URL was truncated and has been removed.
 
       document
         .getElementById("Chat-Container")
@@ -350,42 +347,11 @@
 
         
 
-function positionContactForm(root) {
-  if (!root) return;
-
-  const messages = [...root.querySelectorAll("cb-message")];
-
-  // Find the message containing the contact form.
-  const formMessage = messages.find(message => {
-    const shadow = message.shadowRoot;
-    return shadow?.querySelector("form.cb-input-form");
-  });
-
-  if (!formMessage) return;
-
-  // Find the first message in the conversation.
-  const firstMessage = messages[0];
-
-  if (!firstMessage || firstMessage === formMessage) return;
-
-  // Move the entire contact form message above the welcome.
-  firstMessage.before(formMessage);
-
-  console.log("Contact form message moved above welcome");
-}
-
         function updateWelcome() {
           const root = observedRoot;
           if (!root) return;
 
-          const form =
-  root.querySelector("form.cb-input-form") ||
-  [...root.querySelectorAll("cb-message")].some(
-    message =>
-      message.shadowRoot?.querySelector(
-        "form.cb-input-form"
-      )
-  );
+          const form = root.querySelector("form.cb-input-form");
 
           const messages = [
             ...root.querySelectorAll("cb-message")
@@ -471,16 +437,7 @@ function positionContactForm(root) {
             true
           );
 
-          listObserver = new MutationObserver(
-            updateWelcome
-          );
-
-          listObserver.observe(root, {
-  childList: true,
-  subtree: true
-});
-
-// Watch each message's Shadow DOM as it renders.
+          // Watch each message's Shadow DOM as it renders.
 // Crescendo may populate the text after creating cb-message.
 
 const messageObservers = new WeakMap();
@@ -508,13 +465,9 @@ function watchMessages() {
 }
 
 // Observe newly added message components.
-const originalUpdate = updateWelcome;
-
-listObserver.disconnect();
-
 listObserver = new MutationObserver(() => {
   watchMessages();
-  originalUpdate();
+  updateWelcome();
 });
 
 listObserver.observe(root, {
@@ -523,6 +476,7 @@ listObserver.observe(root, {
 });
 
         watchMessages();
+        updateWelcome();
 
       } // End startMonitoring()
 
