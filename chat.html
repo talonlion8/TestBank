@@ -349,40 +349,43 @@
         }
 
         
+
 function positionContactForm(root) {
   if (!root) return;
 
-  const form = root.querySelector("form.cb-input-form");
-  if (!form) return;
+  const messages = [...root.querySelectorAll("cb-message")];
 
-  // Move the top-level element containing the form,
-  // rather than removing the form from its component.
-  let container = form;
+  // Find the message containing the contact form.
+  const formMessage = messages.find(message => {
+    const shadow = message.shadowRoot;
+    return shadow?.querySelector("form.cb-input-form");
+  });
 
-  while (
-    container.parentElement &&
-    container.parentElement !== root
-  ) {
-    container = container.parentElement;
-  }
+  if (!formMessage) return;
 
-  // Only reposition if the container belongs directly
-  // to the message-list root.
-  if (container.parentElement !== root) return;
+  // Find the first message in the conversation.
+  const firstMessage = messages[0];
 
-  if (root.firstElementChild !== container) {
-    root.prepend(container);
-    console.log("Contact form moved to top");
-  }
+  if (!firstMessage || firstMessage === formMessage) return;
+
+  // Move the entire contact form message above the welcome.
+  firstMessage.before(formMessage);
+
+  console.log("Contact form message moved above welcome");
 }
 
         function updateWelcome() {
           const root = observedRoot;
           if (!root) return;
 
-          const form = root.querySelector(
-            "form.cb-input-form"
-          );
+          const form =
+  root.querySelector("form.cb-input-form") ||
+  [...root.querySelectorAll("cb-message")].some(
+    message =>
+      message.shadowRoot?.querySelector(
+        "form.cb-input-form"
+      )
+  );
 
           const messages = [
             ...root.querySelectorAll("cb-message")
