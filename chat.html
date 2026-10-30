@@ -348,6 +348,34 @@
           );
         }
 
+        
+function positionContactForm(root) {
+  if (!root) return;
+
+  const form = root.querySelector("form.cb-input-form");
+  if (!form) return;
+
+  // Move the top-level element containing the form,
+  // rather than removing the form from its component.
+  let container = form;
+
+  while (
+    container.parentElement &&
+    container.parentElement !== root
+  ) {
+    container = container.parentElement;
+  }
+
+  // Only reposition if the container belongs directly
+  // to the message-list root.
+  if (container.parentElement !== root) return;
+
+  if (root.firstElementChild !== container) {
+    root.prepend(container);
+    console.log("Contact form moved to top");
+  }
+}
+
         function updateWelcome() {
           const root = observedRoot;
           if (!root) return;
